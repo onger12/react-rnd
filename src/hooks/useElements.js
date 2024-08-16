@@ -10,21 +10,25 @@ export const useElements = ({ initialElements = [] } = {}) => {
     const rand = Math.floor(Math.random() * bgColors.length);
     return bgColors[rand];
   }
+  const handleGenerateElementName = () => `elemento-${elements?.length + 1}`;
+  const handleElements = (elements_) => setElements(elements_);
   const handleAddNewElement = ({
-    width = 50, 
-    height = 50, 
+    width = 150, 
+    height = 150, 
     borderWidth = 1, 
-    initialXPos = 30, 
-    initialYPos = 30, 
+    initialXPos = 130, 
+    initialYPos = 130, 
     bgColor = handleGetBgColor(), 
     borderColor = 'border-gray-500', 
   }) => {
     const id = uniqid();
+    const name = handleGenerateElementName();
     setElements(t => (
       [
         ...t, 
         { 
           id, 
+          name,
           width, 
           height, 
           bgColor, 
@@ -56,6 +60,7 @@ export const useElements = ({ initialElements = [] } = {}) => {
 
   return ({
     elements,
+    handleElements,
     handleAddNewElement,
     handleRemoveElement,
     handleUpdateElement,

@@ -5,13 +5,66 @@ html {
 }
 
 body {
-  width: 100vw;
-  height: 100vh;
-  padding: 4;
+  padding: 0;
   margin: 0;
 }
 
-#root {
+.h-1 {
+  height: 8.33%;
+}
+.h-2 {
+  height: 16.66%;
+}
+.h-3 {
+  height: 25%;
+}
+.h-4 {
+  height: 33.33%;
+}
+.h-5 {
+  height: 41.66%;
+}
+.h-6 {
+  height: 50%;
+}
+.h-7 {
+  height: 58.33%;
+}
+.h-8 {
+  height: 66.66%;
+}
+.h-9 {
+  height: 75%;
+}
+.h-10 {
+  height: 83.33%;
+}
+.h-11 {
+  height: 91.66%;
+}
+.h-12 {
   height: 100%;
-  padding: 8;
+}
+
+.text-editable {
+  border: 1px solid transparent; /* Borde para que el área editable sea visible */
+  padding: 8px; /* Espacio interno */
+  border-radius: 4px; /* Esquinas redondeadas */
+  font-family: Arial, sans-serif; /* Fuente del texto */
+  font-size: 16px; /* Tamaño del texto */
+  color: #333; /* Color del texto */
+}
+
+.text-editable:focus {
+  border-color: #007bff; /* Color de borde al enfocar */
+  outline: none; /* Elimina el contorno predeterminado del navegador */
+  background-color: #f9f9f9; /* Color de fondo */
+}
+
+#non-draggable-item {
+  cursor: default;
+}
+
+.react-draggable-dragging {
+  border: dashed  2px red;
 }
