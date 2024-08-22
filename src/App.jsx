@@ -1,11 +1,10 @@
 import { PrimeReactProvider } from 'primereact/api';
-
-import { HomeScreen } from "./screens"
+import { Router } from './router';
 
 export const App = () => {
   return (
     <PrimeReactProvider>
-      <HomeScreen />
+      <Router />
     </PrimeReactProvider>
   )
 }

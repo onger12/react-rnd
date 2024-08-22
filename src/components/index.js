@@ -6,3 +6,8 @@ export * from './common/context-menu-overlay';
 export * from './sidebar/sidebar-sections-title';
 export * from './sidebar/sidbear-section-button';
 export * from './sidebar/sidebar-single-element';
+export * from './video-player';
+export * from './common/header-main';
+export * from './common/header-admin';
+export * from './common/header-learn';
+export * from './learn/school-card';
