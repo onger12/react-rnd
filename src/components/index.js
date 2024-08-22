@@ -10,4 +10,4 @@ export * from './video-player';
 export * from './common/header-main';
 export * from './common/header-admin';
 export * from './common/header-learn';
-export * from './learn/school-card';
+export * from './learn/info-card';

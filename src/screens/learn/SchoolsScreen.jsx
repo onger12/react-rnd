@@ -1,18 +1,16 @@
 import { useEffect, useState } from 'react';
 
-import { SchoolCard } from '../../components';
+import { InfoCard } from '../../components';
 import { LearnWrapper } from '../../wrappers';
-import { getRamdonSchools } from '../../data';
+import { courses, getRamdonSchools } from '../../data';
 
 export const SchoolsScreen = () => {
 
   const [currentSchools, setCurrentSchools] = useState([]);
 
-
   useEffect(() => {
     setCurrentSchools(getRamdonSchools(10));
-  }, [])
-  
+  }, []);  
 
   return (
     <LearnWrapper>
@@ -20,7 +18,7 @@ export const SchoolsScreen = () => {
       <div className='w-full grid gap-2 p-2'>
         {
           currentSchools?.map(school => (
-            <SchoolCard key={school?.id} {...school} />
+            <InfoCard key={school?.id} {...school} qtyDetail={`${courses?.filter(t => t.schoolId == school?.id)?.length} Cursos`} />
           ))
         }
       </div>

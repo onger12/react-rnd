@@ -1,8 +1,11 @@
-import { useLocation, useParams } from "wouter"
-import { DataTable } from 'primereact/datatable'
-import { LearnWrapper } from "../../wrappers";
-import { Column } from "primereact/column";
 import { useEffect, useRef, useState } from "react";
+
+import { useLocation, useParams } from "wouter";
+
+import { Column } from "primereact/column";
+import { DataTable } from 'primereact/datatable';
+
+import { LearnWrapper } from "../../wrappers";
 import { getRamdonCourses, getRamdonSchools, schools } from "../../data";
 
 export const LearnScreen = () => {

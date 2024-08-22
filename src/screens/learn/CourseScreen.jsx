@@ -6,6 +6,8 @@ import { TabMenu } from 'primereact/tabmenu';
 import { VideoPlayer } from '../../components';
 import { ScrolledPanel } from '../../components/video-player/scrolled-panel';
 import { LearnWrapper } from '../../wrappers';
+import { useLocation, useParams } from 'wouter';
+import { courses, schools } from '../../data';
 
 const tabItems = [
   { label: '', icon: 'pi pi-search' },
@@ -153,6 +155,9 @@ export const CourseScreen = () => {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   
+  const [location, setLocation] = useLocation();
+  const { schoolId, dni, courseId } = useParams();
+
   // refs
   const op = useRef(null);
 
@@ -165,27 +170,19 @@ export const CourseScreen = () => {
     if(currentSectionIndex != null && currentVideoIndex != null) {
       setCurrentVideo(seccionList[currentSectionIndex]?.videos[currentVideoIndex]);
     }
-  }, [currentSectionIndex, currentVideoIndex]);  
+  }, [currentSectionIndex, currentVideoIndex]);
+
+  useEffect(() => {
+    console.log('first')
+  }, [dni]);
+  
 
   return (
     <LearnWrapper>
       <div className="min-h-screen">
-        <div className="bg-black-alpha-80 flex py-3 px-2 justify-content-between">
-          <div className="flex align-items-center gap-3">
-            <div className='flex align-items-center justify-content-center pr-3 ml-2 border-right-1 border-gray-600'>
-              <img src={logo} width='110rem' className='cursor-pointer' />
-            </div>
-            <span className='hover:text-gray-300 text-white select-none cursor-pointer'>Nombre de la escuela</span>
-            <span className='text-white select-none'>/</span>
-            <span className='text-white'>Nombre del curso</span>
-          </div>
-          <div className='flex align-items-baseline cursor-pointer hover:text-gray-300 text-white' onClick={(e) => op.current?.toggle(e)}>
-            <div className='flex align-items-center gap-2'>
-              <i className='pi pi-trophy text-gray-300 border-2 p-2 block border-gray-100 border-circle' />
-              <span className='text-xs'>Tu progreso</span>
-              <i className='pi pi-chevron-down text-xs' />
-            </div>
-          </div>
+        <div className='py-2'>
+          <h1 className='my-0'>{courses?.find(t => t.id == courseId)?.name}</h1>
+          <span className='font-italic'>{schools?.find(t => t.id == schoolId)?.name}</span>
         </div>
         <div className='flex'>
           <div className={`${expandedView ? 'w-full' : 'w-9'}`}>
