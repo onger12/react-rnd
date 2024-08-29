@@ -18,7 +18,12 @@ export const SchoolsScreen = () => {
       <div className='w-full grid gap-2 p-2'>
         {
           currentSchools?.map(school => (
-            <InfoCard key={school?.id} {...school} qtyDetail={`${courses?.filter(t => t.schoolId == school?.id)?.length} Cursos`} />
+            <InfoCard 
+              key={school?.id} 
+              {...school} 
+              // qtyDetail={`${courses?.filter(t => t.schoolId == school?.id)?.length} Cursos`} 
+              qtyDetail={`${(Math.floor(Math.random() * 10) + 1)} Cursos`} 
+            />
           ))
         }
       </div>

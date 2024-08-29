@@ -1,5 +1,6 @@
 import { ElementProvider } from "../../context"
 import { PaperAreaMain, SidebarMain } from "../../components"
+import { AdminWrapper } from "../../wrappers"
 
 export const SlidesMakerScreen = () => {
   return (

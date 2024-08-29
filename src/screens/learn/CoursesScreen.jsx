@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useParams } from "wouter";
 
-import { courses } from "../../data";
+import { courses, schools } from "../../data";
 import { InfoCard } from "../../components";
 import { LearnWrapper } from "../../wrappers";
 
@@ -20,7 +20,7 @@ export const CoursesScreen = () => {
 
   return (
     <LearnWrapper>
-      <h1>Cursos</h1>
+      <h1 className="select-none"><span className="text-gray-500 font-italic hover:text-gray-400 transition-all transition-duration-100 transition-linear">{schools?.find(t => t?.id == schoolId)?.name}</span> / Cursos</h1>
       <div className='w-full grid gap-2 p-2'>
         {
           currentCourses?.map(course => (
