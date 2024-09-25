@@ -1,4 +1,4 @@
-import { RootWrapper } from "../wrappers";
+import { RootWrapper } from "../../wrappers";
 
 export const AboutScreen = () => {
   return (

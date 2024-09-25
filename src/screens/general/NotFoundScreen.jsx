@@ -1,0 +1,40 @@
+import { useLocation } from "wouter"
+import { AdminWrapper, LearnWrapper, RootWrapper } from "../../wrappers"
+
+export const NotFoundScreen = () => {
+  const [location] = useLocation();
+  
+  const dni = location?.split('/')[2];
+  localStorage.setItem('dni', dni);
+
+  if(location?.startsWith('/admin')) {
+    return (
+      <AdminWrapper>
+        <NFScreen />
+      </AdminWrapper>
+    )
+  }
+
+  if(location?.startsWith('/learn')) {
+    return (
+      <LearnWrapper>
+        <NFScreen />
+      </LearnWrapper>
+    )
+  }
+
+  return (
+    <RootWrapper>
+      <NFScreen />
+    </RootWrapper>
+  )
+}
+
+const NFScreen = () => (
+  <section className="main-section-calc-height flex justify-content-center align-items-center">
+    <div className="">
+      <span className="select-none block my-0 text-center text-8xl text-red-400">404</span>
+      <span className="select-none text-2xl text-center">No se encontró la página que buscabas.</span>
+    </div>
+  </section> 
+)

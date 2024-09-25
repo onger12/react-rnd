@@ -20,8 +20,8 @@ export const AuthColabScreen = () => {
 
   return (
     <RootWrapper>
-      <section className="main-section-calc-height flex justify-content-center align-items-center">
-        <form onSubmit={handleSubmit} className="flex flex-column gap-2 border-round-sm border-1 border-gray-200 p-3 w-10 md:w-6 lg:w-4">
+      <section className="bg-dotted-1 main-section-calc-height flex justify-content-center align-items-center">
+        <form onSubmit={handleSubmit} className="bg-white flex flex-column gap-2 border-round-sm border-1 border-gray-200 p-3 w-10 md:w-6 lg:w-4">
           <h1 className="tracking-tighter text-2xl my-1">Zona colaboradores</h1>
           <label htmlFor="dni" className='w-full'>
             <span className='block mb-1'>Cédula</span>

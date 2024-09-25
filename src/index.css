@@ -1,3 +1,8 @@
+:root {
+  --PE-color: #082C4E;
+  --CAP-color: #F32837;
+}
+
 html {
   box-sizing: border-box;
 }
@@ -19,6 +24,18 @@ ul {
 a {
   text-decoration: none;
   color: #333;
+}
+.header-main {
+  display: none;
+}
+.header-main-mobile {
+  display: flex;
+}
+.admin-card-width {
+   width : 100%;
+}
+.admin-chart-width {
+   width : 100%;
 }
 .h-05rem {
   height: 0.5rem;
@@ -145,5 +162,62 @@ a {
 }
 
 .main-section-calc-height {
-  min-height: calc(100vh - 3rem);
+  min-height: calc(100vh - 6rem);
+}
+
+.PE-text-color {
+  color: var(--PE-color);
+}
+.CAP-text-color {
+  color: var(--CAP-color);
+}
+.PE-bg-color {
+  background-color: var(--PE-color);
+}
+.CAP-bg-color {
+  background-color: var(--CAP-color);
+}
+.PE-border-color-color {
+  border-color: var(--PE-color);
+}
+.CAP-border-color-color {
+  border-color: var(--CAP-color);
+}
+/* .PE-BG-IMAGE {
+  background-image: url('/public/PE-BG.png');
+  background-size: 75%;
+  background-position: top 150% right -250px;
+  background-repeat: no-repeat;
+} */
+
+.bg-dotted-1 {
+  background-image: url('../public/dot_1.png');
+  background-size: .5%;
+}
+
+.raleway {
+  font-family: "Raleway", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@media only screen and (min-width: 920px) {
+  .admin-card-width {
+    width: 49.55%;
+  }
+  .admin-chart-width {
+    width : 49.55%;
+ }
+  .header-main {
+    display: flex;
+  }
+  .header-main-mobile {
+    display: none;
+  }
+}
+@media only screen and (min-width: 1124px) {
+  .admin-card-width {
+    width: 24.45%;
+  }
 }

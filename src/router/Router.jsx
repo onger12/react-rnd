@@ -1,9 +1,11 @@
 import { Router as RR, Route, Switch } from 'wouter';
 
 import { 
-  AboutScreen, AdminScreen, AssigmentsScreen, AuthAdminScreen, AuthColabScreen, CourseScreen, 
-  CoursesScreen, HomeScreen, LearnScreen, NotFoundScreen, ReviewScreen, SchoolsScreen, SlidesMakerScreen, 
+  AboutScreen, AdminColabsScreen, AdminCoursesScreen, AdminScreen, AdminStatsScreen, AssigmentsScreen, AuthAdminScreen, AuthColabScreen, 
+  CourseScreen, CoursesScreen, HomeScreen, LearnScreen, NotFoundScreen, PolicyScreen, ReviewScreen, SchoolsScreen, SlidesMakerScreen,
+  TermsScreen, 
 } from '../screens';
+import { AdminSchoolsScreen } from '../screens/admin/AdminSchoolsScreen';
 
 export const Router = () => {
   return (
@@ -12,6 +14,8 @@ export const Router = () => {
         <Switch>
           <Route path="/" component={HomeScreen} />
           <Route path="/about" component={AboutScreen} />
+          <Route path="/terms" component={TermsScreen} />
+          <Route path="/policy" component={PolicyScreen} />
           <Route path="/auth/admin" component={AuthAdminScreen} />
           <Route path="/auth/colab" component={AuthColabScreen} />
 
@@ -24,6 +28,10 @@ export const Router = () => {
           <Route path="/learn/:dni/schools/:schoolId/:courseId/:videoId" component={CourseScreen} />
 
           <Route path="/admin" component={AdminScreen} />
+          <Route path="/admin/colabs" component={AdminColabsScreen} />
+          <Route path="/admin/schools" component={AdminSchoolsScreen} />
+          <Route path="/admin/courses" component={AdminCoursesScreen} />
+          <Route path="/admin/stats" component={AdminStatsScreen} />
           <Route path="/admin/maker" component={SlidesMakerScreen} />
           
           <Route component={NotFoundScreen} />

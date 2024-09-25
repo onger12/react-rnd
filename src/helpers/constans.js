@@ -17,3 +17,9 @@ export const sidebarSectionButtons = [
     icon : 'pi pi-user',
   },
 ];
+
+export const companyOptions = [
+  { name : 'Plasticel', company : 'PE', color : 'text-blue-800', },
+  { name : 'Aldor', company : 'CAP', color : 'text-red-400', },
+  { name : 'Trolli', company : 'CT', color : 'text-yellow-400', },
+];
