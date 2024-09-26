@@ -16,3 +16,4 @@ export * from './common/header-learn';
 export * from './common/avatar-misc';
 export * from './common/footer-main';
 export * from './learn/info-card';
+export * from './common/button';

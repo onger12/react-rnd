@@ -4,14 +4,18 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "prod": "vite --mode prod",
+    "dev": "vite --mode dev",
+    "test": "vite --mode test",
+    "build-test": "vite build --mode test",
+    "build-prod": "vite build --mode prod",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
     "@nivo/core": "^0.87.0",
     "@nivo/marimekko": "^0.87.0",
+    "axios": "^1.7.7",
     "framer-motion": "^11.3.28",
     "primeflex": "^3.3.1",
     "primeicons": "^7.0.0",

@@ -37,6 +37,9 @@ export const HeaderAdmin = () => {
           <Link href="/admin/colabs" className="transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4">
             Colaboradores
           </Link>
+          <Link href="/admin/videos" className="transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4">
+            Videos
+          </Link>
           <Link href="/admin/stats" className="transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4">
             Estadisticas
           </Link>

@@ -8,7 +8,7 @@ import { companyOptions } from './helpers';
 export const RootContext = createContext(null);
 
 export const App = () => {
-  
+  const [loaders, setLoaders] = useState({});
   const [currentCompany, setCurrentCompany] = useState();
   const [currentSession, setCurrentSession] = useState();
 
@@ -34,6 +34,7 @@ export const App = () => {
   }
 
   // handlers
+  const handleLoaders = (value) => setLoaders(t => ({...t, ...value}));
   const handleChangeCompany = (newCompany) => {
     setCurrentCompany(newCompany);
     localStorage.setItem('company', JSON.stringify(newCompany));
@@ -61,7 +62,16 @@ export const App = () => {
   return (
     <PrimeReactProvider>
       <RootContext.Provider
-        value={{ currentCompany, currentSession, logoMin, logoFull, handleChangeCompany, handleChangeSession }}
+        value={{ 
+          logoMin, 
+          loaders,
+          logoFull, 
+          currentCompany, 
+          currentSession : { ...currentSession, name : currentSession?.user}, 
+          handleLoaders,
+          handleChangeCompany, 
+          handleChangeSession, 
+        }}
       >
         <Router />
         {/* <SlidesMakerScreen /> */}
