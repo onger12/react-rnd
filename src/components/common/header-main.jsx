@@ -23,13 +23,22 @@ export const HeaderMain = () => {
           }
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link href="/auth/admin" className="transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4">
+          <Link 
+            href="/auth/admin" 
+            className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
+          >
             Administrativo
           </Link>
-          <Link href="/auth/colab" className="transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4">
+          <Link 
+            href="/auth/colab" 
+            className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
+          >
             Colaboradores
           </Link>
-          <Link href="/about" className="transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4">
+          <Link 
+            href="/about" 
+            className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
+          >
             Acerca de
           </Link>
         </nav>

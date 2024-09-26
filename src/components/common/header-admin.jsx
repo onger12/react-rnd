@@ -28,22 +28,40 @@ export const HeaderAdmin = () => {
                 : <img src={logo} className="border-circle w-2rem h-2rem" alt="company_logo" />
             }
           </Link>
-          <Link href="/admin/schools" className="transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4">
+          <Link 
+            href="/admin/schools" 
+            className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
+          >
             Escuelas
           </Link>
-          <Link href="/admin/courses" className="transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4">
+          <Link 
+            href="/admin/courses" 
+            className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
+          >
             Cursos
           </Link>
-          <Link href="/admin/colabs" className="transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4">
+          <Link 
+            href="/admin/colabs" 
+            className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
+          >
             Colaboradores
           </Link>
-          <Link href="/admin/videos" className="transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4">
+          <Link 
+            href="/admin/videos" 
+            className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
+          >
             Videos
           </Link>
-          <Link href="/admin/stats" className="transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4">
+          <Link 
+            href="/admin/stats" 
+            className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
+          >
             Estadisticas
           </Link>
-          <Link href="/admin/maker" className="transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4">
+          <Link 
+            href="/admin/maker" 
+            className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
+          >
             Creador de diapositivas
           </Link>
         </nav>

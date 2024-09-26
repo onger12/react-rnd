@@ -70,3 +70,10 @@ export function GetCourseHead(id) {
     .get(`cgh/courses/${id}`)
     .then((response) => response);
 }
+
+// learn
+export function GetSchoolsByUser(params) {
+  return client
+    .get("cgh/users/schools", {params})
+    .then((response) => response);
+}

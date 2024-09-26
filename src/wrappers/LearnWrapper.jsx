@@ -1,13 +1,17 @@
-import { HeaderLearn } from "../components"
-import { AuthMiddleware } from "../middlewares"
+import { Toast } from "primereact/toast";
 
-export const LearnWrapper = ({ children, px = 4 }) => {
+import { HeaderLearn } from "../components";
+import { AuthMiddleware } from "../middlewares";
+
+export const LearnWrapper = ({ children, px = 4, toastRef }) => {
   return (
     <AuthMiddleware>
       <HeaderLearn />
       <div className={`px-${px}`}>
         {children}
       </div>
+
+      <Toast ref={toastRef} />
     </AuthMiddleware>
   )
 }

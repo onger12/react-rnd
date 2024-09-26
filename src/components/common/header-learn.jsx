@@ -31,13 +31,22 @@ export const HeaderLearn = () => {
                 : <img src={logo} className="border-circle w-2rem h-2rem" alt="company_logo" />
             }
           </Link>
-          <Link href={`/learn/${dni}/schools`} className="transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4">
+          <Link 
+            href={`/learn/${dni}/schools`} 
+            className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline ${active ? 'underline' : ''} underline-offset-4`}  
+          >
             Escuelas
           </Link>
-          <Link href={`/learn/${dni}/assigments`} className="transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4">
+          <Link 
+            href={`/learn/${dni}/assigments`} 
+            className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline ${active ? 'underline' : ''} underline-offset-4`}  
+          >
             Asignados
           </Link>
-          <Link href={`/learn/${dni}/review`} className="transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4">
+          <Link 
+            href={`/learn/${dni}/review`} 
+            className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline ${active ? 'underline' : ''} underline-offset-4`}  
+          >
             Resumen
           </Link>
         </nav>
