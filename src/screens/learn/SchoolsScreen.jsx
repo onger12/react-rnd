@@ -1,10 +1,11 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 
+import { useParams } from 'wouter';
+
 import { useLearn } from '../../hooks';
 import { RootContext } from '../../App';
 import { InfoCard } from '../../components';
 import { LearnWrapper } from '../../wrappers';
-import { useParams } from 'wouter';
 
 export const SchoolsScreen = () => {
 
@@ -31,19 +32,22 @@ export const SchoolsScreen = () => {
       <h1 className='mt-2 select-none'>Escuelas</h1>
       <div className='w-full grid gap-2 p-2'>
         {
-          schools?.map(school => (
+          schools?.map((sch) => (
             <InfoCard 
-              key={school?.id} 
-              {...school} 
+              data={sch}
+              id={sch?.schoolId}
+              key={sch?.schoolId} 
+              name={sch?.schoolName}
+              description={sch?.schoolDescription}
+              qtyDetail={`${sch?.courses?.length} Cursos`} 
               // qtyDetail={`${courses?.filter(t => t.schoolId == school?.id)?.length} Cursos`} 
-              qtyDetail={`${(Math.floor(Math.random() * 10) + 1)} Cursos`} 
             />
           ))
         }
         {
           schools?.length == 0 && !loaders?.schools && (
-            <div className='w-full flex flex-column align-items-center justify-content-center' style={{ height : '60vh'}}>
-              <i className='pi pi-graduation-cap text-7xl text-gray-700 hover:text-gray-900 transition-all transition-duration-200 transition-ease-out' />
+            <div className='w-full flex flex-column align-items-center justify-content-center gap-4' style={{ height : '80vh'}}>
+              <i className='pi pi-graduation-cap text-8xl text-gray-700 hover:text-gray-900 transition-all transition-duration-200 transition-ease-out' />
               <span className='text-4xl font-gray-900 select-none'>No tienes cursos asignados aún :(</span>
             </div>
           )

@@ -13,7 +13,7 @@ export const HomeScreen = () => {
   return (
     <RootWrapper>
       <main className={`flex-1 ${company?.toUpperCase()}-BG-IMAGE`}>
-        <section className="w-full flex py-4 main-section-calc-height">
+        <section className="w-full flex h-screen">
           {
             company == 'PE' && (
               <div className='w-6'>
@@ -31,7 +31,7 @@ export const HomeScreen = () => {
               </p>
             </div>
             <Link
-              href="/auth/colab"
+              href={`/${company}/auth/colab`}
               className="bg-gray-800 hover:bg-gray-700 text-xl text-white font-bold px-4 py-3 border-round-sm block m-0 transition-all transition-duration-200 transition-ease-out"
             >
               Ingresar
@@ -77,7 +77,7 @@ export const HomeScreen = () => {
                 </p>
               </div>
               <Link
-                href="/auth/colab"
+                href={`/${company}/auth/colab`}
                 className="bg-white hover:bg-gray-100 transition-all transition-duration-200 transition-ease-out text-xl text-gray-900 font-bold px-4 py-3 border-round-sm mt-3"
               >
                 Empezar

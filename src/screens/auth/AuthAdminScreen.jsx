@@ -14,10 +14,12 @@ import { RootWrapper } from '../../wrappers';
 export const AuthAdminScreen = () => {
 
   const [validatingSession, setValidatingSession] = useState(true);
+  const [disabledButtonSave, setDisabledButtonSave] = useState(true);
 
-  const { loaders, handleLoaders } = useContext(RootContext);
+  const { loaders, handleLoaders, currentSession, currentCompany, handleChangeSession } = useContext(RootContext);
+  const { company } = currentCompany ?? {};
 
-  const [location, setLocation] = useLocation();
+  const [l, setLocation] = useLocation();
   const { formState, onChange } = useForm({
     username : '',
     password : '',
@@ -27,29 +29,18 @@ export const AuthAdminScreen = () => {
   const toastRef = useRef(null);
 
   // handlers
-  const handleValidateSession = () => {
-    if(!validatingSession) {
-      setValidatingSession(true);
-    }
-
-    try {
-      const session = JSON.parse(localStorage.getItem('session'));
-      if(!session) {
-        throw '';
+  const handleValidateDisableButtonSave = () => {
+    const keys = ['username', 'password'];
+    for (const key in formState) {
+      if(keys.includes(key) && !formState[key]) {
+        return true;
       }
-
-      handleLoginDone(session);
-    } catch (e) {
-      console.error('Error al validar la sesión guardada en memoria del usuario.');
-    } finally {
-      setValidatingSession();
-      // setTimeout(() => {
-      // }, 1500);
     }
   }
   const handleLoginDone = (user) => {
-    localStorage.setItem('session', JSON.stringify(user))
-    setLocation('/admin');
+    localStorage.setItem('session', JSON.stringify(user));
+    handleChangeSession(user);
+    setLocation(`/${company}/admin`);
   }
 
   // bd
@@ -64,6 +55,7 @@ export const AuthAdminScreen = () => {
         user : formState?.username,
         password : formState?.password,
       }
+
       const user = await Login(body);
       handleLoginDone(user);
     } catch (e) {
@@ -71,11 +63,18 @@ export const AuthAdminScreen = () => {
     } finally {
       handleLoaders({ login : false });
     }
-
   }
 
   useEffect(() => {
-    handleValidateSession();
+    setDisabledButtonSave(handleValidateDisableButtonSave());
+  }, [formState]);
+
+  useEffect(() => {
+    if(!currentSession) {
+      setValidatingSession(false);
+      return;
+    }
+    handleLoginDone(currentSession);
   }, []);  
 
   if(validatingSession) return <LoadingScreen />
@@ -115,7 +114,7 @@ export const AuthAdminScreen = () => {
             severity='contrast'
             type="submit"
             loading={loaders?.login}
-            disabled={loaders?.login}
+            disabled={loaders?.login || disabledButtonSave}
             // className='w-full py-2 font-body border-0 outline-none shadow-none text-white bg-gray-800 hover:bg-gray-700 border-round-sm'
             // unstyled
           />

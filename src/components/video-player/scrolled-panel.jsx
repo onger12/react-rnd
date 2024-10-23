@@ -1,12 +1,7 @@
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { SingleVideoCard } from './single-video-card';
 
-export const ScrolledPanel = ({ expandedView, currentVideo, handleExpandedView, seccionList = [], handleCurrentVideoIndex, handleCurrentSectionIndex }) => {
-
-  const handleUpdateCurrentIndexes = ({ videoIndex, sectionIndex }) => {
-    handleCurrentVideoIndex(videoIndex)
-    handleCurrentSectionIndex(sectionIndex)
-  }
+export const ScrolledPanel = ({ expandedView, currentVideo, videos, handleExpandedView, handleCurrentVideo }) => {
 
   return (
     <div className={`flex flex-column max-h-screen sticky top-0 ${expandedView ? 'w-0' : 'flex-grow-1'} transition-all transition-duration-200 transition-ease-out overflow-hidden`}>
@@ -19,23 +14,34 @@ export const ScrolledPanel = ({ expandedView, currentVideo, handleExpandedView, 
       </div>
       <div className='h-full overflow-y-auto'>
         <Accordion multiple activeIndex={[0]}>
-          {
-            seccionList?.map((section, ii) => (
-              <AccordionTab key={section?.name} header={section?.name} contentClassName='mb-0'>
-                {
-                  section?.videos?.map((video, i) => (
-                    <SingleVideoCard 
-                      key={i} 
-                      {...video} 
-                      index={i + 1} 
-                      onClick={() => handleUpdateCurrentIndexes({ videoIndex : i, sectionIndex : ii })} 
-                      active={currentVideo?.title == video?.title} 
-                    />
-                  ))
-                }
-              </AccordionTab>
-            ))
-          }
+          <AccordionTab key={1} header="Principal" contentClassName='mb-0'>
+            {
+              // currentVideo?.videos?.map((section, ii) => (
+              //   <AccordionTab key={section?.name} header={section?.name} contentClassName='mb-0'>
+              //     {
+              //       section?.videos?.map((video, i) => (
+              //         <SingleVideoCard 
+              //           key={i} 
+              //           {...video} 
+              //           index={i + 1} 
+              //           onClick={() => handleUpdateCurrentIndexes({ videoIndex : i, sectionIndex : ii })} 
+              //           active={currentVideo?.title == video?.title} 
+              //         />
+              //       ))
+              //     }
+              //   </AccordionTab>
+              // ))
+              videos?.map((video, i) => (
+                <SingleVideoCard 
+                  key={i} 
+                  {...video} 
+                  index={i + 1} 
+                  active={currentVideo?.videoId == video?.videoId} 
+                  onClick={() => handleCurrentVideo(video)} 
+                />
+              ))
+            }
+          </AccordionTab>
         </Accordion>
       </div>
     </div>

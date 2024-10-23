@@ -4,12 +4,10 @@ import { motion } from "framer-motion"
 
 import { Controls } from './';
 
-export const VideoPlayer = ({ video, handleExpandedView, playingOnMount = false, poster = null }) => {
+export const VideoPlayer = ({ currentVideo, handleExpandedView, playingOnMount = false, handleSendLastProgress }) => {
 
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [currentTime, setCurrentTime] = useState(0);
+  const [currentTime, setCurrentTime] = useState(100);
   const [currentRate, setCurrentRate] = useState(1);
   const [isHovering, setIsHovering] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
@@ -36,7 +34,8 @@ export const VideoPlayer = ({ video, handleExpandedView, playingOnMount = false,
   };
   const handleForwardTenSecs = () => {
     const video = videoRef.current;
-    video.currentTime = Math.min(video.currentTime + 10, duration);
+    if(video.currentTime + 10 > currentVideo?.playSecond) return false;
+    video.currentTime = Math.min(video.currentTime + 10, videoRef?.current?.duration);
   };
   const handleBackwardTenSecs = () => {
     const video = videoRef.current;
@@ -56,16 +55,11 @@ export const VideoPlayer = ({ video, handleExpandedView, playingOnMount = false,
       setAlreadyPlayed(true);
     }
   }
-  const handleTimeUpdate = () => {
-    const currentTime = videoRef.current?.currentTime;
-    const duration = videoRef.current?.duration;
-    setProgress((currentTime / duration) * 100);
-  };
-  const handleProgressChange = (event) => {
-    const newProgress = event.target.value;
-    const duration = videoRef.current?.duration;
-    videoRef.current.currentTime = (newProgress / 100) * duration;
-    setProgress(newProgress);
+  const handleProgressChange = (newProgress) => {
+    if(newProgress > currentVideo?.playSecond) return false;
+
+    videoRef.current.currentTime = newProgress;
+    return true;
   };
   const handleSpeedChange = (rate) => {
     videoRef.current.playbackRate = rate;
@@ -95,9 +89,7 @@ export const VideoPlayer = ({ video, handleExpandedView, playingOnMount = false,
     }
   };
   const handleInactivity = () => {
-    console.log({isHovering})
     if(isHovering) {
-      console.log('down')
       setMouseInactive(true);
     }
   };
@@ -140,12 +132,19 @@ export const VideoPlayer = ({ video, handleExpandedView, playingOnMount = false,
   }, []);
 
   useEffect(() => {
+    if(!currentVideo) return;
     const handleLoadedMetadata = () => {
-      setDuration(videoRef?.current?.duration);
+      if(currentVideo?.playSecond) {
+        videoRef.current.currentTime = currentVideo?.playSecond;
+        setCurrentTime(currentVideo?.playSecond)
+      }
     };
     const handleTimeUpdate = () => {
-      setCurrentTime(videoRef?.current?.currentTime);
-      setProgress((videoRef?.current?.currentTime / videoRef?.current?.duration) * 100);
+      const newProgress = videoRef?.current?.currentTime;
+      setCurrentTime(newProgress);
+      if(Math.floor(newProgress) % 10 == 0) {
+        handleSendLastProgress({ progress : Math.floor(newProgress), videoId : currentVideo?.videoId });
+      }
     };
     const handleSeeking = () => {
       setLoading(true);
@@ -176,7 +175,7 @@ export const VideoPlayer = ({ video, handleExpandedView, playingOnMount = false,
       videoRef?.current?.removeEventListener('waiting', handleWaiting);
       videoRef?.current?.removeEventListener('canplay', handleCanPlay);
     };
-  }, []);
+  }, [currentVideo]);
 
   useEffect(() => {
     const handleMouseMove = () => {
@@ -206,13 +205,12 @@ export const VideoPlayer = ({ video, handleExpandedView, playingOnMount = false,
           <Controls 
             playing={playing} 
             videoRef={videoRef}
-            progress={progress}
-            duration={duration}
             currentTime={currentTime}
             playbackRate={currentRate}
             currentVolume={currentVolume}
             handlePlayVideo={handlePlay}
             handleFullScreen={handleFullScreen}
+            playSecond={currentVideo?.playSecond}
             handleSpeedChange={handleSpeedChange}
             handleExpandedView={handleExpandedView}
             className="absolute bottom-0 left-0 z-4" 
@@ -227,15 +225,13 @@ export const VideoPlayer = ({ video, handleExpandedView, playingOnMount = false,
       { !playing && !loading && <PauseOverlay handlePlay={handlePlay} /> }
       { loading && <LoadingOverlay handlePlay={handlePlay} /> }
       <video
-        className="w-full h-35rem z-2"
+        className="w-full h-full z-2"
         width="100%"
         ref={videoRef}
-        src={video}
-        onTimeUpdate={handleTimeUpdate}
+        src={currentVideo?.videoLink}
         onClick={handlePlay}
         controls={false}
-        poster={!alreadyPlayed && poster}
-        // onMouseEnter={e => console.log('first')}
+        poster={!alreadyPlayed && currentVideo?.poster}
       />
     </div>
   )

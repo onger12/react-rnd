@@ -4,6 +4,7 @@ import { Button } from "primereact/button";
 import { Link, useLocation, useParams } from "wouter";
 
 import { RootContext } from "../../App";
+import { AvatarMisc } from "./avatar-misc";
 
 export const HeaderLearn = () => {
 
@@ -12,11 +13,12 @@ export const HeaderLearn = () => {
   const params = useParams();
   const [location, navigate] = useLocation();
 
-  const dni = params?.dni || localStorage?.getItem('dni');
+  const dni = params?.dni || localStorage?.getItem('dni') || (location?.split('/')?.length > 0 ? location?.split('/')[2] : null);
+  const { company } = params;
 
   // handlers
   const handleLogout = () => {
-    navigate('/auth/colab', { replace : true });
+    navigate(`/${company}/auth/colab`, { replace : true });
   }
 
   return (
@@ -24,7 +26,7 @@ export const HeaderLearn = () => {
       <div className="w-full h-3rem bg-transparent" />
       <header className="bg-white fixed top-0 w-full px-4 h-3rem flex align-items-center justify-content-between">
         <nav className="flex align-items-center gap-4 sm:gap-6">
-          <Link href={`/learn/${dni}`} className="flex align-items-center justify-content-center">
+          <Link href={`/${company}/learn/${dni}`} className="flex align-items-center justify-content-center">
             {
               logo?.toLowerCase()?.includes('avatar') 
                 ? <AvatarMisc specific={logo?.split('_')[1]} bgColor="bg-yellow-400" hoverBgColor="bg-yellow-300" textColor="text-gray-900" />
@@ -32,19 +34,19 @@ export const HeaderLearn = () => {
             }
           </Link>
           <Link 
-            href={`/learn/${dni}/schools`} 
+            href={`/${company}/learn/${dni}/schools`} 
             className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline ${active ? 'underline' : ''} underline-offset-4`}  
           >
             Escuelas
           </Link>
           <Link 
-            href={`/learn/${dni}/assigments`} 
+            href={`/${company}/learn/${dni}/assigments`} 
             className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline ${active ? 'underline' : ''} underline-offset-4`}  
           >
             Asignados
           </Link>
           <Link 
-            href={`/learn/${dni}/review`} 
+            href={`/${company}/learn/${dni}/review`} 
             className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline ${active ? 'underline' : ''} underline-offset-4`}  
           >
             Resumen

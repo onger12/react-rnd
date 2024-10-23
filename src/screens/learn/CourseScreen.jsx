@@ -1,13 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 
-import { OverlayPanel } from 'primereact/overlaypanel';
+import { useParams } from 'wouter';
+
 import { TabMenu } from 'primereact/tabmenu';
+import { OverlayPanel } from 'primereact/overlaypanel';
 
+import { useLearn } from '../../hooks';
+import { RootContext } from '../../App';
 import { VideoPlayer } from '../../components';
-import { ScrolledPanel } from '../../components/video-player/scrolled-panel';
 import { LearnWrapper } from '../../wrappers';
-import { useLocation, useParams } from 'wouter';
-import { courses, schools } from '../../data';
+import { ctc, UpdateVideoProgress } from '../../helpers';
+import { ScrolledPanel } from '../../components/video-player/scrolled-panel';
 
 const tabItems = [
   { label: '', icon: 'pi pi-search' },
@@ -15,186 +18,98 @@ const tabItems = [
   { label: 'Preguntas', icon: '' },
 ];
 
-const seccionList = [
-  {
-    name : 'Sección 1',
-    videos : [
-      {
-        url : 'https://grupoaldor-my.sharepoint.com/:v:/g/personal/juan_martinez_aldoronline_com/EdRP0GshiS9NqRcRUepcKfwBjp8uBUfy4K3evTtufg-xHQ?e=1eEMdj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&download=1',
-        poster : 'https://placehold.co/600x300?text=Video+1',
-        duration : 5,
-        title : 'Video de prueba #1',
-        description : 'Este es el video de prueba #1',
-      },
-      {
-        url : 'https://grupoaldor-my.sharepoint.com/:v:/g/personal/juan_martinez_aldoronline_com/EdRP0GshiS9NqRcRUepcKfwBjp8uBUfy4K3evTtufg-xHQ?e=1eEMdj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&download=1',
-        poster : 'https://placehold.co/600x300?text=Video+2',
-        duration : 7,
-        title : 'Video de prueba #2',
-        description : 'Este es el video de prueba #2',
-      },
-      {
-        url : 'https://grupoaldor-my.sharepoint.com/:v:/g/personal/juan_martinez_aldoronline_com/EdRP0GshiS9NqRcRUepcKfwBjp8uBUfy4K3evTtufg-xHQ?e=1eEMdj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&download=1',
-        poster : 'https://placehold.co/600x300?text=Video+3',
-        duration : 15,
-        title : 'Video de prueba #3',
-        description : 'Este es el video de prueba #3',
-      },
-      {
-        url : 'https://grupoaldor-my.sharepoint.com/:v:/g/personal/juan_martinez_aldoronline_com/EdRP0GshiS9NqRcRUepcKfwBjp8uBUfy4K3evTtufg-xHQ?e=1eEMdj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&download=1',
-        poster : 'https://placehold.co/600x300?text=Video+4',
-        duration : 12,
-        title : 'Video de prueba #4',
-        description : 'Este es el video de prueba #4',
-      },
-      {
-        url : 'https://grupoaldor-my.sharepoint.com/:v:/g/personal/juan_martinez_aldoronline_com/EdRP0GshiS9NqRcRUepcKfwBjp8uBUfy4K3evTtufg-xHQ?e=1eEMdj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&download=1',
-        poster : 'https://placehold.co/600x300?text=Video+5',
-        duration : 3,
-        title : 'Video de prueba #5',
-        description : 'Este es el video de prueba #5',
-      },
-    ],
-  },
-  {
-    name : 'Sección 2',
-    videos : [
-      {
-        url : 'https://grupoaldor-my.sharepoint.com/:v:/g/personal/juan_martinez_aldoronline_com/EdRP0GshiS9NqRcRUepcKfwBjp8uBUfy4K3evTtufg-xHQ?e=1eEMdj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&download=1',
-        poster : 'https://placehold.co/600x300?text=Video+6',
-        duration : 5,
-        title : 'Video de prueba #6',
-        description : 'Este es el video de prueba #6',
-      },
-      {
-        url : 'https://grupoaldor-my.sharepoint.com/:v:/g/personal/juan_martinez_aldoronline_com/EdRP0GshiS9NqRcRUepcKfwBjp8uBUfy4K3evTtufg-xHQ?e=1eEMdj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&download=1',
-        poster : 'https://placehold.co/600x300?text=Video+7',
-        duration : 7,
-        title : 'Video de prueba #7',
-        description : 'Este es el video de prueba #7',
-      },
-    ],
-  },
-  {
-    name : 'Sección 3',
-    videos : [
-      {
-        url : 'https://grupoaldor-my.sharepoint.com/:v:/g/personal/juan_martinez_aldoronline_com/EdRP0GshiS9NqRcRUepcKfwBjp8uBUfy4K3evTtufg-xHQ?e=1eEMdj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&download=1',
-        poster : 'https://placehold.co/600x300?text=Video+11',
-        duration : 5,
-        title : 'Video de prueba #11',
-        description : 'Este es el video de prueba #11',
-      },
-      {
-        url : 'https://grupoaldor-my.sharepoint.com/:v:/g/personal/juan_martinez_aldoronline_com/EdRP0GshiS9NqRcRUepcKfwBjp8uBUfy4K3evTtufg-xHQ?e=1eEMdj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&download=1',
-        poster : 'https://placehold.co/600x300?text=Video+12',
-        duration : 7,
-        title : 'Video de prueba #12',
-        description : 'Este es el video de prueba #12',
-      },
-      {
-        url : 'https://grupoaldor-my.sharepoint.com/:v:/g/personal/juan_martinez_aldoronline_com/EdRP0GshiS9NqRcRUepcKfwBjp8uBUfy4K3evTtufg-xHQ?e=1eEMdj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&download=1',
-        poster : 'https://placehold.co/600x300?text=Video+13',
-        duration : 15,
-        title : 'Video de prueba #13',
-        description : 'Este es el video de prueba #13',
-      },
-      {
-        url : 'https://grupoaldor-my.sharepoint.com/:v:/g/personal/juan_martinez_aldoronline_com/EdRP0GshiS9NqRcRUepcKfwBjp8uBUfy4K3evTtufg-xHQ?e=1eEMdj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&download=1',
-        poster : 'https://placehold.co/600x300?text=Video+11',
-        duration : 5,
-        title : 'Video de prueba #11',
-        description : 'Este es el video de prueba #11',
-      },
-      {
-        url : 'https://grupoaldor-my.sharepoint.com/:v:/g/personal/juan_martinez_aldoronline_com/EdRP0GshiS9NqRcRUepcKfwBjp8uBUfy4K3evTtufg-xHQ?e=1eEMdj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&download=1',
-        poster : 'https://placehold.co/600x300?text=Video+12',
-        duration : 7,
-        title : 'Video de prueba #12',
-        description : 'Este es el video de prueba #12',
-      },
-      {
-        url : 'https://grupoaldor-my.sharepoint.com/:v:/g/personal/juan_martinez_aldoronline_com/EdRP0GshiS9NqRcRUepcKfwBjp8uBUfy4K3evTtufg-xHQ?e=1eEMdj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&download=1',
-        poster : 'https://placehold.co/600x300?text=Video+13',
-        duration : 15,
-        title : 'Video de prueba #13',
-        description : 'Este es el video de prueba #13',
-      },
-      {
-        url : 'https://grupoaldor-my.sharepoint.com/:v:/g/personal/juan_martinez_aldoronline_com/EdRP0GshiS9NqRcRUepcKfwBjp8uBUfy4K3evTtufg-xHQ?e=1eEMdj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&download=1',
-        poster : 'https://placehold.co/600x300?text=Video+11',
-        duration : 5,
-        title : 'Video de prueba #11',
-        description : 'Este es el video de prueba #11',
-      },
-      {
-        url : 'https://grupoaldor-my.sharepoint.com/:v:/g/personal/juan_martinez_aldoronline_com/EdRP0GshiS9NqRcRUepcKfwBjp8uBUfy4K3evTtufg-xHQ?e=1eEMdj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&download=1',
-        poster : 'https://placehold.co/600x300?text=Video+12',
-        duration : 7,
-        title : 'Video de prueba #12',
-        description : 'Este es el video de prueba #12',
-      },
-      {
-        url : 'https://grupoaldor-my.sharepoint.com/:v:/g/personal/juan_martinez_aldoronline_com/EdRP0GshiS9NqRcRUepcKfwBjp8uBUfy4K3evTtufg-xHQ?e=1eEMdj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&download=1',
-        poster : 'https://placehold.co/600x300?text=Video+13',
-        duration : 15,
-        title : 'Video de prueba #13',
-        description : 'Este es el video de prueba #13',
-      },
-    ],
-  },
-];
-
-const logo = '/logo_white.svg';
-
 export const CourseScreen = () => {
 
   // states
-  const [expandedView, setExpandedView] = useState(false);
   const [currentVideo, setCurrentVideo] = useState(null);
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
-  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
-  
-  const [location, setLocation] = useLocation();
-  const { schoolId, dni, courseId } = useParams();
+  const [currentVideos, setCurrentVideos] = useState([]);
+  const [expandedView, setExpandedView] = useState(false);
+  const [currentCourse, setCurrentCourse] = useState(null);
+
+  // context
+  const { handleLoaders } = useContext(RootContext);
 
   // refs
   const op = useRef(null);
+  const toastRef = useRef(null);
+
+  // hooks
+  const { schoolId, dni, courseId } = useParams();
+  const { schools, getSchoolsByUser, getCourseHeadByUser, getCoursesByUser, courses : allCourses } = useLearn({ toastRef, handleLoaders });
+
+  // state
+  // const currentCourse = history.state;
 
   // handlers
-  const handleExpandedView = () => setExpandedView(t => !t);
-  const handleCurrentVideoIndex = (i) => setCurrentVideoIndex(i);
-  const handleCurrentSectionIndex = (i) => setCurrentSectionIndex(i);
-
-  useEffect(() => {
-    if(currentSectionIndex != null && currentVideoIndex != null) {
-      setCurrentVideo(seccionList[currentSectionIndex]?.videos[currentVideoIndex]);
+  const handleUpdateVideoProgressInList = (body) => {
+    const vds = [...currentVideos];
+    const index = vds?.findIndex(t => t?.videoId == body?.videoId);
+    if(index >= 0) {
+      vds[index] = {...vds[index], playSecond : body?.playSecond};
+      setCurrentVideos(vds);
+      history.replaceState({...currentCourse, videos : vds}, '');
     }
-  }, [currentSectionIndex, currentVideoIndex]);
+  }
+  const handleInitScreen = async () => {
+    if(!dni || !courseId) return;
+    getCoursesByUser({ document : dni });
+    // const course = await getCourseHeadByUser({ id : courseId, headers : { document : dni } });
+    // setCurrentCourse(course);
+    // setCurrentVideo(course?.videos[0])
+    getSchoolsByUser({ document : dni });
+  }
+
+  const handleExpandedView = () => setExpandedView(t => !t);
+  const handleCurrentVideo = (cv) => setCurrentVideo(cv);
+
+  // BD
+  const handleSendLastProgress = async ({progress, videoId }) => {
+    if(progress <= currentVideo?.playSecond) return;
+    try {
+      const body = {
+        videoId,
+        courseId,
+        document : dni,
+        playSecond : progress,
+      }
+      const headers = { document : dni };
+      await UpdateVideoProgress({ body, headers });
+      handleUpdateVideoProgressInList(body);
+    } catch (e) {
+      ctc(e, 'Hubo un error al actualizar el progreso del video', toastRef);
+    }
+  }
 
   useEffect(() => {
-    console.log('first')
-  }, [dni]);
-  
+    handleInitScreen();
+  }, [dni, courseId]);
+
+  useEffect(() => {
+    if(allCourses?.length > 0) {
+      const cc = allCourses?.find(t => t?.courseId == courseId);
+      setCurrentCourse(cc);
+      setCurrentVideo(cc?.videos[0] ?? null);
+    }
+  }, [allCourses]);
 
   return (
-    <LearnWrapper>
+    <LearnWrapper toastRef={toastRef}>
       <div className="min-h-screen">
         <div className='py-2'>
-          <h1 className='my-0'>{courses?.find(t => t.id == courseId)?.name}</h1>
-          <span className='font-italic'>{schools?.find(t => t.id == schoolId)?.name}</span>
+          <h1 className='my-0'>{currentCourse?.courseName}</h1>
+          <span className='font-italic'>{schools?.find(t => t.schoolId == schoolId)?.schoolName}</span>
         </div>
         <div className='flex'>
           <div className={`${expandedView ? 'w-full' : 'w-9'}`}>
             <VideoPlayer 
+              currentVideo={currentVideo}
               expandedView={expandedView}
               handleExpandedView={handleExpandedView}
-              video={currentVideo?.url}
-              poster={currentVideo?.poster}
+              handleSendLastProgress={handleSendLastProgress}
             />
             <TabMenu model={tabItems} className='mx-3' activeIndex={1} />
             <div className='py-3 px-5'>
-              <span className='block text-2xl pb-3'>{currentVideo?.title}</span>
+              <span className='block text-2xl pb-3'>{currentVideo?.videoName}</span>
               <div className='flex gap-5 align-items-center'>
                 <div className=''>
                   <span className='font-bold text-sm block'>4.5 <i className='pi pi-star text-yellow-400' /></span>
@@ -214,12 +129,11 @@ export const CourseScreen = () => {
             <div style={{ height : 500, width : '100%' }} />
           </div>  
           <ScrolledPanel 
-            seccionList={seccionList}
+            currentVideo={currentVideo} 
             expandedView={expandedView} 
-            currentVideo={currentVideo}
+            videos={currentCourse?.videos} 
             handleExpandedView={handleExpandedView} 
-            handleCurrentVideoIndex={handleCurrentVideoIndex}
-            handleCurrentSectionIndex={handleCurrentSectionIndex}
+            handleCurrentVideo={handleCurrentVideo} 
           />
         </div>
 

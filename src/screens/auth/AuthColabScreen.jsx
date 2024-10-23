@@ -1,21 +1,26 @@
+import { useContext } from 'react';
+
 import { useLocation } from 'wouter';
 
 import { Button } from 'primereact/button';
 import { InputNumber } from 'primereact/inputnumber';
 
 import { useForm } from '../../hooks';
+import { RootContext } from '../../App';
 import { RootWrapper } from '../../wrappers';
 
 export const AuthColabScreen = () => {
 
+  const { currentCompany } = useContext(RootContext);
   const [location, setLocation] = useLocation();
   const { formState, onChangeManual } = useForm({ dni : '' });
+
+  const { company } = currentCompany || {};
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    localStorage.setItem('session', JSON.stringify({ name : 'super', time : new Date() }))
-    setLocation(`/learn/${formState?.dni}`);
+    setLocation(`/${company}/learn/${formState?.dni}`);
   }
 
   return (

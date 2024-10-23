@@ -6,14 +6,16 @@ import { AvatarMisc } from "./avatar-misc";
 
 export const HeaderAdmin = () => {
 
-  const [location, navigate] = useLocation();
+  const [l, navigate] = useLocation();
 
-  const { currentSession, logoMin : logo } = useContext(RootContext);
+  const { currentSession, currentCompany, logoMin : logo, handleChangeSession } = useContext(RootContext);
+  const { company } = currentCompany || {};
 
   // handlers
   const handleLogout = () => {
     localStorage.removeItem('session');
-    navigate('/auth/admin', { replace : true });
+    handleChangeSession(null);
+    navigate(`/${company}/auth/admin`, { replace : true });
   }
 
   return (
@@ -21,7 +23,7 @@ export const HeaderAdmin = () => {
       <div className="w-full h-3rem bg-transparent" />
       <header className="bg-white fixed top-0 w-full px-4 h-3rem gap-3 align-items-center justify-content-between header-main">
         <nav className="flex align-items-center gap-4 sm:gap-6">
-          <Link href="/admin" className="flex align-items-center justify-content-center">
+          <Link href={`/${company}/admin`} className="flex align-items-center justify-content-center">
             {
               logo?.toLowerCase()?.includes('avatar') 
                 ? <AvatarMisc specific={logo?.split('_')[1]} bgColor="bg-yellow-400" hoverBgColor="bg-yellow-300" textColor="text-gray-900" />
@@ -29,30 +31,30 @@ export const HeaderAdmin = () => {
             }
           </Link>
           <Link 
-            href="/admin/schools" 
+            href={`/${company}/admin/schools`} 
             className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
           >
             Escuelas
           </Link>
           <Link 
-            href="/admin/courses" 
+            href={`/${company}/admin/courses`} 
             className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
           >
             Cursos
           </Link>
           <Link 
-            href="/admin/colabs" 
+            href={`/${company}/admin/colabs`} 
             className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
           >
             Colaboradores
           </Link>
           <Link 
-            href="/admin/videos" 
+            href={`/${company}/admin/videos`} 
             className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
           >
             Videos
           </Link>
-          <Link 
+          {/* <Link 
             href="/admin/stats" 
             className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
           >
@@ -63,7 +65,7 @@ export const HeaderAdmin = () => {
             className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
           >
             Creador de diapositivas
-          </Link>
+          </Link> */}
         </nav>
         {/* <Link onClick={handleLogout} href="/auth/colab" className="flex gap-2 align-items-center transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4">
           {currentSession?.name}

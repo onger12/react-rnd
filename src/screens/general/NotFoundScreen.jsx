@@ -5,7 +5,6 @@ export const NotFoundScreen = () => {
   const [location] = useLocation();
   
   const dni = location?.split('/')[2];
-  localStorage.setItem('dni', dni);
 
   if(location?.startsWith('/admin')) {
     return (

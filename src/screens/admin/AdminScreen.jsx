@@ -1,4 +1,6 @@
+import { useEffect } from "react"
 import { AdminCard, AdminChart, AdminPopularCoursesCard } from "../../components"
+import { useAdmin } from "../../hooks"
 import { AdminWrapper } from "../../wrappers"
 
 const cards = [
@@ -33,6 +35,13 @@ const cards = [
 ]
 
 export const AdminScreen = () => {
+
+  const {  } = useAdmin();
+
+  useEffect(() => {
+    
+  }, []);  
+
   return (
     <AdminWrapper>
       <section className="px-3">

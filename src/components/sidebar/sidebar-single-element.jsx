@@ -19,7 +19,6 @@ export const SidebarSingleElement = ({ name, element, draggableRef, draggablePro
     setIsEditable(false);
   }
   const handleOpenOptions = () => {
-    console.log('first');
   }
 
   return (

@@ -1,19 +1,21 @@
 import { useState } from "react"
-import { ctc, GetCourses, GetSchools, GetSchoolsByUser } from "../helpers";
+import { ctc, GetCourseHead, GetCourses, GetCoursesByUser, GetSchoolHead, GetSchools, GetSchoolsByUser } from "../helpers";
 
 export const useLearn = ({ toastRef, handleLoaders }) => {
+  const [currentSchool, setCurrentSchool] = useState(null);
   const [schools, setSchools] = useState([]);
   const [courses, setCourses] = useState([]);
 
   // handlers
   const handleSchools = (sch) => setSchools(sch);
   const handleCourses = (crs) => setCourses(crs);
+  const handleCurrentSchool = (cs) => setCurrentSchool(cs);
   
   // BD
   const getSchoolsByUser = async (params) => {
     handleLoaders({ schools : true });
     try {
-      const schools = await GetSchoolsByUser(params);
+      const schools = await GetSchoolsByUser({params, headers : params});
       handleSchools(schools);
     } catch (e) {
       ctc(e, 'Hubo un error al consultar las escuelas.', toastRef);
@@ -21,10 +23,21 @@ export const useLearn = ({ toastRef, handleLoaders }) => {
       handleLoaders({ schools : false });
     }
   }
-  const getCourses = async (params) => {
+  const getSchoolHeadByUser = async ({id, headers}) => {
+    handleLoaders({ currentSchool : true });
+    try {
+      const school = await GetSchoolHead({ id, headers });
+      handleCurrentSchool(school);
+    } catch (e) {
+      ctc(e, 'Hubo un error al consultar la escuela actual.', toastRef);
+    } finally {
+      handleLoaders({ currentSchool : false });
+    }
+  }
+  const getCoursesByUser = async (params) => {
     handleLoaders({ courses : true });
     try {
-      const courses = await GetCourses(params);
+      const courses = await GetCoursesByUser({params, headers : params});
       handleCourses(courses);
     } catch (e) {
       ctc(e, 'Hubo un error al consultar los cursos.', toastRef);
@@ -32,11 +45,24 @@ export const useLearn = ({ toastRef, handleLoaders }) => {
       handleLoaders({ courses : false });
     }
   }
+  const getCourseHeadByUser = async ({ id, headers }) => {
+    handleLoaders({ courseHead : true });
+    try {
+      return await GetCourseHead({id, headers});
+    } catch (e) {
+      ctc(e, 'Hubo un error al consultar el curso.', toastRef);
+    } finally {
+      handleLoaders({ courseHead : false });
+    }
+  }
 
   return ({
     schools,
     courses,
-    getCourses,
+    currentSchool,
+    getCoursesByUser,
     getSchoolsByUser,
+    getSchoolHeadByUser,
+    getCourseHeadByUser,
   })
 }

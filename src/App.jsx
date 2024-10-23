@@ -22,8 +22,8 @@ export const App = () => {
       logoFull = '/Capacitaciones-APP/PE_LOGO_FULL.png';
       break;
     case 'CAP':
-      logoMin = '/Capacitaciones-APP/CAP_LOGO.webp';
-      logoFull = '/Capacitaciones-APP/CAP_LOGO_FULL.webp';
+      logoMin = '/Capacitaciones-APP/CAP_LOGO.png';
+      logoFull = '/Capacitaciones-APP/CAP_LOGO_FULL.png';
       break;
     case 'CT':
       logoMin = 'avatar_CT';
@@ -67,7 +67,7 @@ export const App = () => {
           loaders,
           logoFull, 
           currentCompany, 
-          currentSession : { ...currentSession, name : currentSession?.user}, 
+          currentSession : !!currentSession ? { ...currentSession, name : currentSession?.user} : currentSession, 
           handleLoaders,
           handleChangeCompany, 
           handleChangeSession, 

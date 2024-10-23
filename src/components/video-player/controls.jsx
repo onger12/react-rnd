@@ -6,10 +6,9 @@ import { SpeedOverlayPanel, VolumeOverlayPanel, IconTooltip, ProgressBar } from 
 export const Controls = ({ 
   playing, 
   videoRef, 
-  progress, 
-  duration, 
   className, 
   maximized,
+  playSecond, 
   currentTime,
   playbackRate, 
   currentVolume,
@@ -30,7 +29,7 @@ export const Controls = ({
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
     >
-      <ProgressBar progress={progress} handleProgressChange={handleProgressChange} videoRef={videoRef} />
+      <ProgressBar playSecond={playSecond} handleProgressChange={handleProgressChange} videoRef={videoRef} />
       <div className='flex justify-content-between align-items-center px-2'>
         <div className='flex align-items-center gap-4'>
           <IconTooltip 
@@ -57,7 +56,7 @@ export const Controls = ({
             onClick={handleForwardTenSecs}
           />
           <span className="select-none text-xl font-bold text-white font-family-quicksand">
-            {formatTimeHHMMSS(currentTime)} / {formatTimeHHMMSS(duration)}
+            {formatTimeHHMMSS(currentTime)} / {formatTimeHHMMSS(videoRef?.current?.duration)}
           </span>
           <IconTooltip 
             icon="pi pi-comment" 

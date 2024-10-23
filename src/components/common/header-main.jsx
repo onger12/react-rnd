@@ -1,21 +1,20 @@
 import { useContext } from "react";
 
 import { Link } from "wouter";
-import { Dropdown } from 'primereact/dropdown';
 
 import { RootContext } from "../../App";
 import { AvatarMisc } from "./avatar-misc";
-import { companyOptions } from "../../helpers";
 
 export const HeaderMain = () => {
 
-  const { currentCompany, logoFull : logo, handleChangeCompany } = useContext(RootContext);
+  const { currentCompany, logoFull : logo } = useContext(RootContext);
+  const { company } = currentCompany;
 
   return (
     <>
       <div className="w-full h-3rem bg-transparent" />
       <header className="bg-white fixed top-0 w-full px-4 h-3rem flex align-items-center gap-5">
-        <Link href="/" className="flex align-items-center justify-content-center">
+        <Link href={`/${company}/`} className="flex align-items-center justify-content-center">
           {
             logo?.toLowerCase()?.includes('avatar') 
               ? <AvatarMisc specific={logo?.split('_')[1]} bgColor="bg-yellow-400" hoverBgColor="bg-yellow-300" textColor="text-gray-900" />
@@ -24,19 +23,19 @@ export const HeaderMain = () => {
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
           <Link 
-            href="/auth/admin" 
+            href={`/${company}/auth/admin`}
             className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
           >
-            Administrativo
+            Administrativos
           </Link>
           <Link 
-            href="/auth/colab" 
+            href={`/${company}/auth/colab`}
             className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
           >
             Colaboradores
           </Link>
           <Link 
-            href="/about" 
+            href={`/${company}/about`}
             className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline underline-offset-4 ${active ? 'underline' : ''}`}
           >
             Acerca de

@@ -12,12 +12,12 @@ client.interceptors.request.use(
     const session = localStorage.getItem('session');
     const company = localStorage.getItem('company');
     if(company) {
-      const { company : name } = JSON.parse(company);
+      const { company : name } = JSON.parse(company) ?? {};
       config.headers["Company"] = name;
     }
 
     if(session) {
-      const { token } = JSON.parse(session);
+      const { token } = JSON.parse(session) ?? {};
       config.headers["X-Api-key"] = token;
     }
 
@@ -35,9 +35,18 @@ client.interceptors.response.use(
   }, 
   (error) => {
     if (error.response && error.response.status == 401) {
-      // localStorage.removeItem('session');
-      // window.location.href = '/';
+      const base = 'Capacitaciones-APP/';
+      const company = window.location.href?.split(base)[1]?.split('/')[0];
+      if(location.href?.includes('/learn')) {
+        window.location.href = `/${base}${company}/auth/colab`;
+      } else {
+        localStorage.removeItem('session');
+        window.location.href = `/${base}${company}`;
+      }
+    } else if (error.response && error.response.status == 403) {
+      error = 'La cédula proporcionada no existe en los usuarios registrados.'
     }
+
     return Promise.reject(error);
   }
 );
@@ -55,25 +64,140 @@ export function GetSchools(params) {
     .get("cgh/schools", {params})
     .then((response) => response);
 }
-export function GetSchoolHead(id) {
+export function AddNewSchool(body) {
   return client
-    .get(`schools/${id}`)
+    .post("cgh/schools", body)
+    .then((response) => response);
+}
+export function UpdateSchool(body) {
+  return client
+    .put("cgh/schools", body)
+    .then((response) => response);
+}
+export function DeleteSchool(body) {
+  return client
+    .delete("cgh/schools", { data : body })
+    .then((response) => response);
+}
+export function GetSchoolHead({id, headers}) {
+  return client
+    .get(`cgh/schools/${id}`, { headers })
     .then((response) => response);
 }
 export function GetCourses(params) {
   return client
-    .get("cgh/courses", {params})
+  .get("cgh/courses", {params})
+  .then((response) => response);
+}
+export function GetCourseHead({id, headers}) {
+  return client
+    .get(`cgh/courses/${id}`, { headers })
     .then((response) => response);
 }
-export function GetCourseHead(id) {
+export function AddCourse(body) {
   return client
-    .get(`cgh/courses/${id}`)
+    .post("cgh/courses", body)
+    .then((response) => response);
+}
+export function EditCourse(body) {
+  return client
+    .put("cgh/courses", body)
+    .then((response) => response);
+}
+export function DeleteCourse(body) {
+  return client
+    .delete("cgh/courses", { data : body })
+    .then((response) => response);
+}
+export function AddVideosToCourse(body) {
+  return client
+    .post("cgh/courses/videos", body)
+    .then((response) => response);
+}
+export function RemoveVideoFromCourse(body) {
+  return client
+    .delete("cgh/courses/videos", { data : body })
+    .then((response) => response);
+}
+export function AddCourseToSchool(body) {
+  return client
+    .post('cgh/schools/courses', body)
+    .then((response) => response);
+}
+export function RemoveCourseFromSchool(body) {
+  return client
+    .delete('cgh/schools/courses', { data : body })
+    .then((response) => response);
+}
+export function GetVideos(params) {
+  return client
+    .get('cgh/videos', {params})
+    .then((response) => response);
+}
+export function AddVideo(body) {
+  return client
+    .post('cgh/videos', body)
+    .then((response) => response);
+}
+export function EditVideo(body) {
+  return client
+    .put('cgh/videos', body)
+    .then((response) => response);
+}
+export function DeleteVideo(body) {
+  return client
+    .delete('cgh/videos', { data : body})
+    .then((response) => response);
+}
+export function GetUsers(params) {
+  return client
+    .get('cgh/users', {params})
+    .then((response) => response);
+}
+export function EditUsers(body) {
+  return client
+    .put('cgh/users', body)
+    .then((response) => response);
+}
+export function AddNewUser(body) {
+  return client
+    .post('cgh/users', body)
+    .then((response) => response);
+}
+export function DeleteUser(body) {
+  return client
+    .delete('cgh/users', { data : body})
+    .then((response) => response);
+}
+export function AddCoursesToUser(body) {
+  return client
+    .post("cgh/courses/users", body)
+    .then((response) => response);
+}
+export function RemoveUserFromColab(body) {
+  return client
+    .delete("cgh/courses/users", { data : body })
+    .then((response) => response);
+}
+export function SyncVideos(body) {
+  return client
+    .post("cgh/videos/sync/sharepoint", body)
     .then((response) => response);
 }
 
 // learn
-export function GetSchoolsByUser(params) {
+export function GetSchoolsByUser({params, headers}) {
   return client
-    .get("cgh/users/schools", {params})
+    .get("cgh/users/schools", {params, headers})
+    .then((response) => response);
+}
+export function GetCoursesByUser({params, headers}) {
+  return client
+    .get("cgh/users/courses", {params, headers})
+    .then((response) => response);
+}
+export function UpdateVideoProgress({body, headers}) {
+  return client
+    .put("cgh/users/videos/progress", body, {headers})
     .then((response) => response);
 }

@@ -20,7 +20,6 @@ export const LearnScreen = () => {
   const tableChangeBgHover = useRef('hover:bg-gray-100 transition-all transition-duration-100 transition-ease-in').current;
 
   // handlers
-  console.log(location)
   const handleShowSchoolDetail = (id) => setLocation(`${location}/schools/${id}`);
 
   // bodys

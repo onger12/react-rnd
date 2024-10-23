@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
-export const ProgressBar = ({ videoRef }) => {
+export const ProgressBar = ({ videoRef, handleProgressChange, playSecond }) => {
     const [progress, setProgress] = useState(0);
     const [buffered, setBuffered] = useState(0);
     const progressBarRef = useRef(null);
@@ -10,8 +10,12 @@ export const ProgressBar = ({ videoRef }) => {
       const rect = progressBarRef.current.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
       const newTime = (clickX / rect.width) * videoRef.current.duration;
-      videoRef.current.currentTime = newTime;
-      setProgress((clickX / rect.width) * 100);
+      const flag = handleProgressChange(newTime);
+      // videoRef.current.currentTime = newTime;
+
+      if(flag) {
+        setProgress((clickX / rect.width) * 100);
+      }
     };
 
     // Actualiza el progreso y el buffer
@@ -19,12 +23,12 @@ export const ProgressBar = ({ videoRef }) => {
       const currentProgress = (videoRef.current.currentTime / videoRef.current.duration) * 100;
       setProgress(currentProgress);
 
-      const bufferedRanges = videoRef.current.buffered;
-      if (bufferedRanges.length > 0) {
-        const bufferedEnd = bufferedRanges.end(bufferedRanges.length - 1);
-        const bufferedProgress = (bufferedEnd / videoRef.current.duration) * 100;
-        setBuffered(bufferedProgress);
-      }
+      // const bufferedRanges = videoRef.current.buffered;
+      // if (bufferedRanges.length > 0) {
+      //   const bufferedEnd = bufferedRanges.end(bufferedRanges.length - 1);
+      //   const bufferedProgress = (bufferedEnd / videoRef.current.duration) * 100;
+      //   setBuffered(bufferedProgress);
+      // }
     };
 
     useEffect(() => {
@@ -37,6 +41,13 @@ export const ProgressBar = ({ videoRef }) => {
         videoElement.removeEventListener('progress', updateProgress);
       };
     }, []);
+
+    useEffect(() => {
+      if(playSecond != null && !Number.isNaN(playSecond / 1)) {
+        setBuffered((playSecond / videoRef.current.duration) * 100);
+        setProgress((playSecond / videoRef.current.duration) * 100);
+      }
+    }, [playSecond]);
 
     return (
       <div 

@@ -1,16 +1,24 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
+
+import { useParams } from 'wouter';
+import { Toast } from 'primereact/toast';
 
 import { RootContext } from '../App';
-import { LoadingScreen } from '../screens';
+import { companyOptions } from '../helpers';
+import { SelectCompanyScreen } from '../screens';
 import { FooterMain, HeaderMain } from '../components';
-import { Toast } from 'primereact/toast';
 
 export const RootWrapper = ({ children, toastRef }) => {
 
-  const { currentCompany } = useContext(RootContext);
+  const { currentCompany, handleChangeCompany } = useContext(RootContext);
+  const { company } = useParams();
+
+  useEffect(() => {
+    handleChangeCompany(companyOptions?.find(t => t?.company == company) ?? null);
+  }, [company]);
 
   if(!currentCompany) {
-    return <LoadingScreen />
+    return <SelectCompanyScreen />
   }
 
   return (

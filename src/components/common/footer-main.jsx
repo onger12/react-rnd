@@ -9,14 +9,14 @@ export const FooterMain = ({ companyName }) => {
         <Link 
           href="/terms" 
           className={(active) => `text-xs hover:underline underline-offset-4 ${active ? 'underline' : ''}`} 
-          prefetch={false}
+          prefetch="false"
         >
           Términos del servicio
         </Link>
         <Link 
           href="/policy" 
           className={(active) => `text-xs hover:underline underline-offset-4 ${active ? 'underline' : ''}`} 
-          prefetch={false}
+          prefetch="false"
         >
           Políticas de privacidad
         </Link>

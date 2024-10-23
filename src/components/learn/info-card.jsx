@@ -1,11 +1,11 @@
 import { useLocation } from 'wouter'
 
-export const InfoCard = ({ name, description, id, qtyDetail }) => {
+export const InfoCard = ({ name, description, id, qtyDetail, data }) => {
   
   const [location, setLocation] = useLocation();
 
   // handlers
-  const handleShowDetail = () => setLocation(`${location}/${id}`);
+  const handleShowDetail = () => setLocation(`${location}/${id}`, { state : data });
 
   return (
     <div className='col cursor-pointer min-w-20rem border-round-xl flex flex-column justify-content-between p-3 h-auto border-1 border-gray-200 hover:border-gray-300' onClick={handleShowDetail}>
