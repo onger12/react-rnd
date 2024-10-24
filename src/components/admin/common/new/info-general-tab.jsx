@@ -5,7 +5,7 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 
 import { RootContext } from "../../../../App";
-import { AddNewSchool, ctc } from "../../../../helpers";
+import { AddCourse, AddNewSchool, AddNewUser, ctc } from "../../../../helpers";
 
 export const InfoGeneralTab = ({ onChange, formState, toastRef, disabled, dataKeyId, handleUpdateCurrentData, handleHide, formData }) => {
 
@@ -23,10 +23,10 @@ export const InfoGeneralTab = ({ onChange, formState, toastRef, disabled, dataKe
           var res = await AddNewSchool(formState);
           break;
         case 'courseId':
-          // await UpdateSchool(body);
+          var res = await AddCourse(formState);
           break;
-        case 'userId':
-          // await UpdateSchool(body);
+        case 'document':
+          var res = await AddNewUser(formState);
           break;
         default:
           throw 'Method save not implemented yet';
@@ -75,7 +75,7 @@ export const InfoGeneralTab = ({ onChange, formState, toastRef, disabled, dataKe
   )
 }
 
-const LabelWInput = ({ label, required, className, type, props = {}, inputKey, disabled, onChange, formState }) => (
+const LabelWInput = ({ label, required, className, type, props = {}, inputKey, disabled, onChange, formState, inputDisabled }) => (
   <label className="w-full">
     <span>{label}{ !!required && <span className="text-red-400 font-bold">*</span> }</span>
     {
@@ -85,9 +85,9 @@ const LabelWInput = ({ label, required, className, type, props = {}, inputKey, d
             {...props} 
             name={inputKey} 
             onChange={onChange} 
-            disabled={disabled} 
             value={formState[inputKey]} 
             className={`w-full ${className}`} 
+            disabled={disabled || inputDisabled?.new} 
           />
         )
         : type == 'InputTextarea'
@@ -97,9 +97,9 @@ const LabelWInput = ({ label, required, className, type, props = {}, inputKey, d
                 {...props} 
                 name={inputKey} 
                 onChange={onChange} 
-                disabled={disabled} 
                 value={formState[inputKey]} 
                 className={`w-full ${className}`} 
+                disabled={disabled || inputDisabled?.new} 
               />
           )
           : <></>

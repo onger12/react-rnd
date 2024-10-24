@@ -5,3 +5,4 @@ export * from './dateFromat';
 export * from './handleToast';
 export * from './formatTimeHHMMSS';
 export * from './convertKeysToLowerCase';
+export * from './getRelatedDataKeyPlural'

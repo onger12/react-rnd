@@ -7,7 +7,7 @@ import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
 
 import { useAdmin } from '../../hooks';
 import { RootContext } from '../../App';
-import { EditDialog, NewDialog } from '../../components';
+import { EditDialog, NewDialog, Table } from '../../components';
 import { AdminWrapper } from '../../wrappers';
 
 const formData = [
@@ -43,12 +43,12 @@ export const AdminSchoolsScreen = () => {
       icon: 'pi pi-exclamation-triangle',
       defaultFocus: 'reject',
       acceptLabel : 'Si',
-      accept : () => deleteSchool({schoolId : sch?.schoolId}, () => handleRemoveSchoolFromSchool(sch)),
+      accept : () => deleteSchool({schoolId : sch?.schoolId}, () => handleRemoveSchoolFromState(sch)),
     });
   }
 
   // handlers
-  const handleUpdateRelatedDataFromData = ({ body, schoolId }) => {
+  const handleUpdateCourseFromSchool = ({ body, schoolId }) => {
     if(!schoolId) return;
     const schools_ = [...schools];
     const index = schools_.findIndex(t => t?.schoolId == schoolId);
@@ -65,7 +65,7 @@ export const AdminSchoolsScreen = () => {
     const usersCount = sch?.courses?.length > 0 ? sch?.usersCount : 0;
     handleSchools([{...sch, coursesCount, usersCount }, ...schools]);
   }
-  const handleRemoveSchoolFromSchool = (sch) => handleSchools(schools?.filter(t => t?.schoolId != sch?.schoolId));
+  const handleRemoveSchoolFromState = (sch) => handleSchools(schools?.filter(t => t?.schoolId != sch?.schoolId));
   const handleRemoveCourseFromSchool = ({ body }) => {
     if(!body?.schoolId || !body?.courseId) return;
     const schools_ = [...schools];
@@ -166,25 +166,12 @@ export const AdminSchoolsScreen = () => {
       <section className='px-3 py-2'>
         <h1>Todas las Escuelas</h1>
         <div className="flex w-full align-items-center gap-2">
-          <DataTable
-            rows={10} 
-            // paginator
-            scrollable
-            size="small" 
-            showGridlines
-            removableSort
-            footer={BodyFooterTablaEscuela}
+          <Table
             value={schools ?? []}
-            scrollHeight='70vh'
-            className='w-full'
-            // header={BodyHeader}
-            // rowsPerPageOptions={[10, 25, 50, 100]} 
-            emptyMessage="No hay escuelas aún"
-            pt={{ footer : { style : { padding : 0 } } }}
-            // virtualScrollerOptions={{ itemSize: 46 }}
             loading={loaders?.schools}
-            // currentPageReportTemplate="{first} de {last} - {totalRecords}"
-            // paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
+            footer={BodyFooterTablaEscuela}
+            emptyMessage="No hay escuelas aún"
+            virtualScrollerOptions={schools?.length > 30 ? { itemSize: 46 } : null}
           >
             <Column 
               field="schoolName"
@@ -214,7 +201,7 @@ export const AdminSchoolsScreen = () => {
               header="Acciones"
               body={BodyAcciones}
             />
-          </DataTable>
+          </Table>
         </div>
         <EditDialog 
           dataId="schoolId" 
@@ -232,7 +219,7 @@ export const AdminSchoolsScreen = () => {
           relatedDataKeyDescription="schoolDescription"
           handleUpdateData={handleUpdateSchoolInMemory} 
           handleRemoveRelatedDataFromData={handleRemoveCourseFromSchool} 
-          handleUpdateRelatedDataFromData={handleUpdateRelatedDataFromData}
+          handleUpdateRelatedDataFromData={handleUpdateCourseFromSchool}
           initialFormState={{ schoolName: currentSchoolToEdit?.schoolName, schoolDescription : currentSchoolToEdit?.schoolDescription }} 
         />
         <NewDialog 

@@ -7,7 +7,7 @@ import { TabPanel, TabView } from "primereact/tabview";
 import { CursosTab } from "./data-tab";
 import { useForm } from "../../../../hooks";
 import { InfoGeneralTab } from "./info-general-tab";
-import { Button } from "primereact/button";
+import { handleGetRelatedDataKeyPlural } from "../../../../helpers";
 
 export const NewDialog = ({ 
   dataId,
@@ -47,23 +47,19 @@ export const NewDialog = ({
     onHide && onHide();
     setCurrentTabIndex(0);
   }
-  const handleGetRelatedDataKeyPlural = () => {
-    const [l] = relatedDataId?.toLowerCase()?.trim()?.split('id');
-    return `${l}s`;
-  }
   const handleUpdateCurrentData = (value) => {
     setCurrentData(t => ({...(t ?? {}), ...value}));
     setCurrentTabIndex(1);
   }
   const handleUpdateRelatedDataFromData = (add) => {
-    const key = handleGetRelatedDataKeyPlural();
+    const key = handleGetRelatedDataKeyPlural({ relatedDataId });
     const relatedData = [...currentData[key], ...add];
     handleUpdateCurrentData({ [key] : relatedData});
   }
   const handleRemoveRelatedDataFromData = (remove) => {
     if(!remove[relatedDataId]) return;
     
-    const key = handleGetRelatedDataKeyPlural();
+    const key = handleGetRelatedDataKeyPlural({ relatedDataId });
     const relatedData = [...currentData[key]];
     const index = relatedData?.findIndex(t => t[relatedDataId] == remove[relatedDataId]);
     if(index >= 0) {
@@ -81,7 +77,7 @@ export const NewDialog = ({
 
   useEffect(() => {
     setCurrentRelatedData(allRelatedData?.map(t => {
-      const found = ((currentData && currentData[handleGetRelatedDataKeyPlural()]) ?? [])?.find(s => s[relatedDataId] == t[relatedDataId]);
+      const found = ((currentData && currentData[handleGetRelatedDataKeyPlural({ relatedDataId })]) ?? [])?.find(s => s[relatedDataId] == t[relatedDataId]);
 
       return ({
         ...t, 
@@ -113,7 +109,7 @@ export const NewDialog = ({
             handleUpdateCurrentData={handleUpdateCurrentData} 
           />
         </TabPanel>
-        <TabPanel header={`${secondTabTitle} Asignados (${(currentData && currentData[handleGetRelatedDataKeyPlural()]?.length) ?? 0})`} disabled={!currentData}>
+        <TabPanel header={`${secondTabTitle} Asignados (${(currentData && currentData[handleGetRelatedDataKeyPlural({ relatedDataId })]?.length) ?? 0})`} disabled={!currentData}>
           <CursosTab 
             dataKeyId={dataId} 
             toastRef={toastRef} 
@@ -127,9 +123,9 @@ export const NewDialog = ({
             currentRelatedData={currentRelatedData} 
             dataId={currentData ? currentData[dataId] : null} 
             relatedDataKeyDescription={relatedDataKeyDescription} 
-            relatedData={currentData ? currentData[handleGetRelatedDataKeyPlural()] : null} 
             handleUpdateRelatedDataFromData={handleUpdateRelatedDataFromData} 
             handleRemoveRelatedDataFromData={handleRemoveRelatedDataFromData} 
+            relatedData={currentData ? currentData[handleGetRelatedDataKeyPlural({ relatedDataId })] : null} 
           />
         </TabPanel>
       </TabView>

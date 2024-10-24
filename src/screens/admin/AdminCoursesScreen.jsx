@@ -8,7 +8,19 @@ import { useAdmin } from '../../hooks';
 import { RootContext } from '../../App';
 import { AdminWrapper } from '../../wrappers';
 import { ctc, DeleteCourse } from '../../helpers';
-import { EditCourseDialog, NewCourseDialog } from '../../components';
+import { EditDialog, NewDialog } from '../../components';
+
+const formData = [
+  { label : 'Nombre', required : true, type : 'InputText', inputKey : 'courseName' },
+  { label : 'Descripción', required : true, type : 'InputTextarea', inputKey : 'courseDescription' },
+]
+
+const relatedDataFields = [
+  { field : 'videoName', header : 'Nombre', sortable : true, filter : true },
+  { field : 'videoDescription', header : 'Descripción', sortable : true, filter : true, body : 'description' },
+  { field : 'usersCount', header : 'Estudiantes inscritos', align : 'right' },
+  { field : 'actions', header : 'Acciones', align : 'center', include : ['remove'] },
+]
 
 export const AdminCoursesScreen = () => {
 
@@ -24,29 +36,45 @@ export const AdminCoursesScreen = () => {
   const { getVideos, getCourses, videos, courses, handleCourses } = useAdmin({ handleLoaders, toastRef });
 
   // handlers
-  const handleUpdateCourseInState = (c, updateCurrentCourseEditing = false) => {
+  const handleRemoveVideoFromCourse = ({ body }) => {
+    if(!body?.courseId || !body?.videoId) return;
+    const courses_ = [...courses];
+    const index = courses_.findIndex(t => t?.courseId == body?.courseId);
+    if(index >= 0) {
+      const videos_ = courses_[index]?.videos?.filter(t => t?.videoId != body?.videoId);
+      const usersCount = videos_?.length > 0 ? courses_[index]?.usersCount : 0;
+      courses_[index] = {...courses_[index], videos : videos_, videosCount : videos_?.length, usersCount};
+
+      handleCourses(courses_);
+      setCurrentCourseToEdit(courses_[index]);
+    }
+  }
+  const handleUpdateCourseFromSchool = ({ body, courseId }) => {
+    if(!courseId) return;
+    const courses_ = [...courses];
+    const index = courses_.findIndex(t => t?.courseId == courseId);
+    if(index >= 0) {
+      const videos_ = [...body, ...courses_[index]?.videos];
+      courses_[index] = { ...courses_[index], videos : videos_, videosCount : videos_?.length };
+
+      handleCourses(schools_);
+      setCurrentCourseToEdit(schools_[index]);
+    }
+  }
+  const handleUpdateCourseInState = (c) => {
     const courses_ = [...courses];
     const index = courses_?.findIndex(t => t?.courseId == c?.courseId);
     if(index >= 0) {
       courses_[index] = {...courses_[index], ...c};
       handleCourses(courses_);
-      if(updateCurrentCourseEditing) {
-        setCurrentCourseToEdit({...c});
-      }
+      setCurrentCourseToEdit({...c});
     }
   }
-  const handleAddNewCourseInState = (course) => handleCourses([course, ...courses]);
-  const handleUpdateCoursesListInState = (course) => {
-    const courses_ = [...courses];
+  const handleAddNewCourse = (course) => {
+    const videosCount = course?.videos?.length ?? 0;
+    const usersCount = course?.videos?.length > 0 ? course?.usersCount : 0;
+    handleCourses([{...course, usersCount, videosCount }, ...courses]);
   }
-  // const handleRemoveCourseFromList = (c) => {
-  //   const courses_ = [...courses];
-  //   const index = courses_?.findIndex(t => t?.courseId == c?.courseId);
-  //   if(index >= 0) {
-  //     courses_[index] = {...courses_[index], inactive : true};
-  //     handleCourses(courses_);
-  //   }
-  // }
   const handleRemoveCourseFromList = (c) => handleCourses(courses?.filter(t => t?.courseId != c?.courseId))
   const handleInitScreen = () => {
     getVideos({ inactive : false, take : 100000, skip : 0 });
@@ -131,26 +159,20 @@ export const AdminCoursesScreen = () => {
       <section className='px-3 py-2'>
         <h1>Todos los Cursos</h1>
         <div className="flex w-full align-items-center gap-2">
-          <DataTable
+          <DataTable 
             rows={10} 
-            // paginator
             scrollable
             size="small" 
             showGridlines
             removableSort
-            footer={BodyFooterTablaCurso}
-            value={courses ?? []}
-            scrollHeight='70vh'
             className='w-full'
-            // header={BodyHeader}
-            // rowsPerPageOptions={[10, 25, 50, 100]} 
+            scrollHeight='70vh'
+            value={courses ?? []}
+            footer={BodyFooterTablaCurso}
             emptyMessage="No hay cursos aún"
-            virtualScrollerOptions={{ itemSize: 46 }}
             pt={{ footer : { style : { padding : 0 } } }}
-            // virtualScrollerOptions={{ itemSize: 46 }}
             loading={loaders?.inventoryHead || loaders?.consolidateLines}
-            // currentPageReportTemplate="{first} de {last} - {totalRecords}"
-            // paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
+            virtualScrollerOptions={courses?.length > 30 ? { itemSize: 46 } : null}
           >
             <Column 
               field="courseName"
@@ -187,7 +209,7 @@ export const AdminCoursesScreen = () => {
           </DataTable>
         </div>
       </section>
-      <EditCourseDialog 
+      {/* <EditCourseDialog 
         allVideos={videos}
         visible={currentCourseToEdit}
         onHide={() => setCurrentCourseToEdit(null)}
@@ -198,6 +220,42 @@ export const AdminCoursesScreen = () => {
         visible={addingNewCourse}
         onHide={() => setAddingNewCourse(false)}
         handleAddNewCourseInState={handleAddNewCourseInState}
+      /> */}
+      
+      <EditDialog 
+        dataId="courseId" 
+        formData={formData} 
+        dataName="courseName" 
+        secondTabTitle="Videos" 
+        relatedDataId="videoId" 
+        allRelatedData={videos} 
+        data={currentCourseToEdit} 
+        relatedDataKeyName="videoName" 
+        visible={!!currentCourseToEdit} 
+        relatedDataFields={relatedDataFields} 
+        relatedData={currentCourseToEdit?.videos} 
+        onHide={() => setCurrentCourseToEdit(false)} 
+        handleUpdateData={handleUpdateCourseInState} 
+        relatedDataKeyDescription="courseDescription" 
+        handleRemoveRelatedDataFromData={handleRemoveVideoFromCourse} 
+        handleUpdateRelatedDataFromData={handleUpdateCourseFromSchool} 
+        initialFormState={{ courseName: currentCourseToEdit?.courseName, courseDescription : currentCourseToEdit?.courseDescription }} 
+      />
+      <NewDialog 
+        dataId="courseId" 
+        formData={formData} 
+        dataName="courseName" 
+        secondTabTitle="Videos" 
+        relatedDataId="videoId" 
+        allRelatedData={videos} 
+        dialogTitle="Nuevo Curso"
+        visible={!!addingNewCourse} 
+        relatedDataKeyName="videoName" 
+        relatedDataFields={relatedDataFields}
+        handleAddNewEntity={handleAddNewCourse} 
+        onHide={() => setAddingNewCourse(false)} 
+        relatedDataKeyDescription="courseDescription"
+        initialFormState={{ courseName: '', courseDescription : '' }} 
       />
     </AdminWrapper>
   )

@@ -6,7 +6,7 @@ import { DataTable } from "primereact/datatable";
 import { MultiSelect } from "primereact/multiselect";
 
 import { RootContext } from "../../../../App";
-import { AddCourseToSchool, ctc, RemoveCourseFromSchool } from "../../../../helpers";
+import { AddCoursesToUser, AddCourseToSchool, AddVideosToCourse, ctc, RemoveCourseFromSchool, RemoveUserFromColab, RemoveVideoFromCourse } from "../../../../helpers";
 import { BodyDescription } from "../body-description";
 
 export const CursosTab = ({ 
@@ -46,10 +46,10 @@ export const CursosTab = ({
           await AddCourseToSchool(body);
           break;
         case 'courseId':
-          // await UpdateSchool(body);
+          await AddVideosToCourse(body);
           break;
-        case 'userId':
-          // await UpdateSchool(body);
+        case 'document':
+          await AddCoursesToUser(body);
           break;
         default:
           throw 'Method save not implemented yet'
@@ -78,10 +78,10 @@ export const CursosTab = ({
           await RemoveCourseFromSchool(body);
           break;
         case 'courseId':
-          // await UpdateSchool(body);
+          await RemoveVideoFromCourse(body);
           break;
-        case 'userId':
-          // await UpdateSchool(body);
+        case 'document':
+          await RemoveUserFromColab(body);
           break;
         default:
           throw 'Method save not implemented yet'

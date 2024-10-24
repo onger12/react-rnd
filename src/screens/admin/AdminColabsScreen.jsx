@@ -7,7 +7,19 @@ import { useAdmin } from '../../hooks';
 import { RootContext } from '../../App';
 import { AdminWrapper } from '../../wrappers';
 import { ctc, dateFormat, DeleteUser } from '../../helpers';
-import { EditColabDialog, NewColabDialog, Table } from '../../components';  
+import { EditDialog, NewDialog, Table } from '../../components';
+
+const formData = [
+  { label : 'Documento', required : true, type : 'InputText', inputKey : 'document', inputDisabled : { new : false, edit : true } },
+  { label : 'Nombre', required : true, type : 'InputText', inputKey : 'userName' },
+]
+
+const relatedDataFields = [
+  { field : 'courseName', header : 'Nombre', sortable : true, filter : true },
+  { field : 'courseDescription', header : 'Descripción', sortable : true, filter : true, body : 'description' },
+  { field : 'usersCount', header : 'Estudiantes inscritos', align : 'right' },
+  { field : 'actions', header : 'Acciones', align : 'center', include : ['remove'] },
+]
 
 export const AdminColabsScreen = () => {
 
@@ -23,15 +35,38 @@ export const AdminColabsScreen = () => {
   const { getUsers, users, getCourses, handleUsers, courses } = useAdmin({ handleLoaders, toastRef });
 
   // handlers
-  const handleUpdateColabInState = (colab, updateCurrentEditing) => {
+  const handleUpdateColabInState = (colab) => {
     const colabs = [...users];
     const index = colabs?.findIndex(t => t?.document == colab?.document);
     if(index >= 0) {
       colabs[index] = {...colabs[index],...colab};
       handleUsers(colabs);
-      if(updateCurrentEditing) {
-        setCurrentColabToEdit({...colabs[index], ...colab});
-      }
+      setCurrentColabToEdit({...colabs[index], ...colab});
+    }
+  }
+  const handleUpdateCourseFromColab = ({ body, document }) => {
+    if(!document) return;
+    const colabs_ = [...users];
+    const index = colabs_.findIndex(t => t?.document == document);
+    if(index >= 0) {
+      const courses_ = [...body, ...colabs_[index]?.courses];
+      colabs_[index] = { ...colabs_[index], courses : courses_, coursesCount : courses_?.length };
+
+      handleUsers(colabs_);
+      setCurrentColabToEdit(colabs_[index]);
+    }
+  }
+  const handleRemoveCourseFromColab = ({ body }) => {
+    if(!body?.document || !body?.courseId) return;
+    const colabs_ = [...users];
+    const index = colabs_.findIndex(t => t?.document == body?.document);
+    if(index >= 0) {
+      const courses_ = colabs_[index]?.courses?.filter(t => t?.courseId != body?.courseId);
+      const usersCount = courses_?.length > 0 ? colabs_[index]?.usersCount : 0;
+      colabs_[index] = {...colabs_[index], courses : courses_, coursesCount : courses_?.length, usersCount};
+
+      handleUsers(colabs_);
+      setCurrentColabToEdit(colabs_[index]);
     }
   }
   const handleAddNewColabInState = (user) => handleUsers([user, ...users]);
@@ -100,10 +135,10 @@ export const AdminColabsScreen = () => {
         <div className="flex w-full align-items-center gap-2">
           <Table
             value={users ?? []} 
-            entityType="Colaboradores"
             footer={BodyFooterTablaColab} 
             emptyMessage="No hay colaboradores aún" 
             loading={loaders?.inventoryHead || loaders?.consolidateLines} 
+            virtualScrollerOptions={users?.length > 30 ? { itemSize: 46 } : null}
           >
             <Column 
               field="document"
@@ -141,7 +176,7 @@ export const AdminColabsScreen = () => {
           </Table>
         </div>
       </section>
-      <EditColabDialog
+      {/* <EditColabDialog
         allCourses={courses}
         visible={currentColabToEdit}
         onHide={() => setCurrentColabToEdit(null)}
@@ -152,6 +187,42 @@ export const AdminColabsScreen = () => {
         visible={addingNewColab}
         onHide={() => setAddingNewColab(false)}
         handleAddNewColabInState={handleAddNewColabInState}
+      /> */}
+      
+      <EditDialog 
+        dataId="document" 
+        formData={formData} 
+        dataName="userName" 
+        secondTabTitle="Cursos" 
+        relatedDataId="courseId" 
+        allRelatedData={courses} 
+        data={currentColabToEdit} 
+        relatedDataKeyName="courseName" 
+        visible={!!currentColabToEdit} 
+        relatedDataFields={relatedDataFields}
+        relatedData={currentColabToEdit?.courses} 
+        onHide={() => setCurrentColabToEdit(false)} 
+        handleUpdateData={handleUpdateColabInState} 
+        relatedDataKeyDescription="schoolDescription"
+        handleRemoveRelatedDataFromData={handleRemoveCourseFromColab} 
+        handleUpdateRelatedDataFromData={handleUpdateCourseFromColab}
+        initialFormState={{ document: currentColabToEdit?.document, userName : currentColabToEdit?.userName }} 
+      />
+      <NewDialog 
+        dataId="document" 
+        formData={formData} 
+        dataName="userName" 
+        secondTabTitle="Cursos" 
+        relatedDataId="courseId" 
+        allRelatedData={courses} 
+        dialogTitle="Nuevo Colaborador"
+        visible={!!addingNewColab} 
+        relatedDataKeyName="courseName" 
+        relatedDataFields={relatedDataFields}
+        handleAddNewEntity={handleAddNewColabInState} 
+        onHide={() => setAddingNewColab(false)} 
+        relatedDataKeyDescription="courseDescription"
+        initialFormState={{ document: '', userName : '' }} 
       />
     </AdminWrapper>
   )

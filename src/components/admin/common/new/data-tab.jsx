@@ -6,7 +6,7 @@ import { DataTable } from "primereact/datatable";
 import { MultiSelect } from "primereact/multiselect";
 
 import { RootContext } from "../../../../App";
-import { AddCourseToSchool, ctc, RemoveCourseFromSchool } from "../../../../helpers";
+import { AddCoursesToUser, AddCourseToSchool, AddVideosToCourse, ctc, handleGetRelatedDataKeyPlural, RemoveCourseFromSchool, RemoveUserFromColab, RemoveVideoFromCourse } from "../../../../helpers";
 import { BodyDescription } from "../body-description";
 
 export const CursosTab = ({ 
@@ -33,8 +33,7 @@ export const CursosTab = ({
   // BD
   const handleDoneAddNewRelatedData = async () => {
     handleLoaders({ addRelatedData : true });
-    const [l] = relatedDataKeyId?.toLowerCase()?.trim()?.split('id');
-    const key = `${l}sIds`;
+    const key = `${handleGetRelatedDataKeyPlural({ relatedDataId : relatedDataKeyId })}Ids`;
     try {
       const body = {
         [dataKeyId] : dataId,
@@ -46,14 +45,16 @@ export const CursosTab = ({
           await AddCourseToSchool(body);
           break;
         case 'courseId':
-          // await UpdateSchool(body);
+          await AddVideosToCourse(body);
           break;
-        case 'userId':
-          // await UpdateSchool(body);
+        case 'document':
+          await AddCoursesToUser(body);
           break;
         default:
           throw 'Method save not implemented yet'
       }
+
+      console.log(currentRelatedDataToAdd)
 
       handleUpdateRelatedDataFromData(currentRelatedDataToAdd);
       setCurrentRelatedDataToAdd(null);
@@ -78,10 +79,10 @@ export const CursosTab = ({
           await RemoveCourseFromSchool(body);
           break;
         case 'courseId':
-          // await UpdateSchool(body);
+          await RemoveVideoFromCourse(body);
           break;
-        case 'userId':
-          // await UpdateSchool(body);
+        case 'document':
+          await RemoveUserFromColab(body);
           break;
         default:
           throw 'Method save not implemented yet'

@@ -26,7 +26,6 @@ export const EditDialog = ({
   relatedDataFields,
   initialFormState = {},
   handleUpdateSingleData,
-  relatedDataKeyDescription,
   handleRemoveRelatedDataFromData,
   handleUpdateRelatedDataFromData,
   firstTabTitle = "Información general",
@@ -100,7 +99,6 @@ export const EditDialog = ({
             dataId={data ? data[dataId] : null} 
             relatedDataFields={relatedDataFields}
             currentRelatedData={currentRelatedData}
-            relatedDataKeyDescription={relatedDataKeyDescription}
             handleUpdateRelatedDataFromData={handleUpdateRelatedDataFromData}
             handleRemoveRelatedDataFromData={handleRemoveRelatedDataFromData}
           />

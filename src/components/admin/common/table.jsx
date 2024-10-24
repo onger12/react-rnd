@@ -3,6 +3,7 @@ import { DataTable } from "primereact/datatable"
 export const Table = ({ 
   children,
   rows = 10, 
+  style = {},
   value = [],
   header = null,
   itemSize = 46,
@@ -16,7 +17,6 @@ export const Table = ({
   removableSort = true, 
   scrollHeight = minHeight,
   tableClassName = 'border-0', 
-  style = { minHeight : minHeight },
   virtualScrollerOptions = { itemSize },
   rowsPerPageOptions = [10, 25, 50, 100],
   emptyMessage = `No hay ${entityType} aún`,
