@@ -17,6 +17,9 @@ export * from './common/footer-main';
 export * from './common/avatar-misc';
 export * from './common/header-learn';
 export * from './common/header-admin';
+export * from './common/error-placing';
+export * from './common/loading-placing';
+export * from './common/no-content-placing';
 export * from './common/context-menu-overlay';
 
 export * from './sidebar/sidebar-main';

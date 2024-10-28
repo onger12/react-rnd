@@ -146,6 +146,14 @@ a {
   max-height: calc(100vh - 4.5rem);
 }
 
+.exam-resolve-height {
+  height: calc(100vh - 4.5rem);
+}
+
+.error-placing-height {
+  height: calc(100vh - 4.5rem);
+}
+
 .hover-cursor-text {
   cursor: text;
 }

@@ -34,13 +34,14 @@ export const useLearn = ({ toastRef, handleLoaders }) => {
       handleLoaders({ currentSchool : false });
     }
   }
-  const getCoursesByUser = async (params) => {
+  const getCoursesByUser = async (params, onError) => {
     handleLoaders({ courses : true });
     try {
       const courses = await GetCoursesByUser({params, headers : params});
       handleCourses(courses);
     } catch (e) {
       ctc(e, 'Hubo un error al consultar los cursos.', toastRef);
+      onError && onError();
     } finally {
       handleLoaders({ courses : false });
     }

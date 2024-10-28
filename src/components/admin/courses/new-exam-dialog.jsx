@@ -166,7 +166,6 @@ export const NewExamDialog = ({ visible, onHide }) => {
       handleQuestions(qs);
       return;
     }
-    console.log(currentTabIndex)
 
     const l = currentQuestions.slice(0, currentTabIndex);
     const r = currentQuestions.slice(currentTabIndex + 1);
