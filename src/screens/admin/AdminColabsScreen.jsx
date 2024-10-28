@@ -197,15 +197,15 @@ export const AdminColabsScreen = () => {
         relatedDataId="courseId" 
         allRelatedData={courses} 
         data={currentColabToEdit} 
-        relatedDataKeyName="courseName" 
         visible={!!currentColabToEdit} 
-        relatedDataFields={relatedDataFields}
+        relatedDataKeyName="courseName" 
+        relatedDataFields={relatedDataFields} 
         relatedData={currentColabToEdit?.courses} 
         onHide={() => setCurrentColabToEdit(false)} 
         handleUpdateData={handleUpdateColabInState} 
-        relatedDataKeyDescription="schoolDescription"
+        relatedDataKeyDescription="schoolDescription" 
         handleRemoveRelatedDataFromData={handleRemoveCourseFromColab} 
-        handleUpdateRelatedDataFromData={handleUpdateCourseFromColab}
+        handleUpdateRelatedDataFromData={handleUpdateCourseFromColab} 
         initialFormState={{ document: currentColabToEdit?.document, userName : currentColabToEdit?.userName }} 
       />
       <NewDialog 

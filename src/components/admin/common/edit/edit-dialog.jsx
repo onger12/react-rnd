@@ -59,7 +59,7 @@ export const EditDialog = ({
         disabled : !!found
       })
     }));
-  }, [allRelatedData, visible]);
+  }, [allRelatedData, data, visible]);
 
   return (
     <Dialog

@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { motion } from "framer-motion"
+import { motion } from 'framer-motion';
 
 import { Controls } from './';
+import { Button } from 'primereact/button';
 
-export const VideoPlayer = ({ currentVideo, handleExpandedView, playingOnMount = false, handleSendLastProgress }) => {
+export const VideoPlayer = ({ currentVideo, handleExpandedView, playingOnMount = false, handleSendLastProgress, expandedView }) => {
 
   const [loading, setLoading] = useState(true);
-  const [currentTime, setCurrentTime] = useState(100);
   const [currentRate, setCurrentRate] = useState(1);
+  const [videoError, setVideoError] = useState(null);
+  const [currentTime, setCurrentTime] = useState(100);
   const [isHovering, setIsHovering] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
@@ -23,22 +25,29 @@ export const VideoPlayer = ({ currentVideo, handleExpandedView, playingOnMount =
   const inactivityTimeout = useRef(null);
 
   // handlers
+  const handleReloadVideo = () => {
+    setLoading(true);
+    setVideoError(false);
+    videoRef.current?.load();
+  }
+  const handleVideoError = (e) => {
+    setLoading(false);
+    setVideoError(!!e);
+  }
   const handleToggleCurrentVolume = (e) => {
     if(e?.target?.className?.includes('icon-volume-identifier')) {
       setCurrentVolume(currentVolume == 0 ? 100 : 0);
     }
 
   }
-  const handleCurrentVolume = (newVolume, fuente) => {
-    setCurrentVolume(newVolume);
-  };
+  const handleCurrentVolume = (newVolume) => setCurrentVolume(newVolume);
   const handleForwardTenSecs = () => {
-    const video = videoRef.current;
+    const video = videoRef?.current;
     if(video.currentTime + 10 > currentVideo?.playSecond) return false;
     video.currentTime = Math.min(video.currentTime + 10, videoRef?.current?.duration);
   };
   const handleBackwardTenSecs = () => {
-    const video = videoRef.current;
+    const video = videoRef?.current;
     video.currentTime = Math.max(video.currentTime - 10, 0);
   };
   const handlePlay = () => {
@@ -111,10 +120,10 @@ export const VideoPlayer = ({ currentVideo, handleExpandedView, playingOnMount =
   useEffect(() => {
     const handleFullScreenChange = () => {
       setFullScreen(
-        document.fullscreenElement === videoRef.current ||
-        document.webkitFullscreenElement === videoRef.current ||
-        document.mozFullScreenElement === videoRef.current ||
-        document.msFullscreenElement === videoRef.current
+        document.fullscreenElement === videoRef?.current ||
+        document.webkitFullscreenElement === videoRef?.current ||
+        document.mozFullScreenElement === videoRef?.current ||
+        document.msFullscreenElement === videoRef?.current
       );
     };
 
@@ -140,7 +149,7 @@ export const VideoPlayer = ({ currentVideo, handleExpandedView, playingOnMount =
       }
     };
     const handleTimeUpdate = () => {
-      const newProgress = videoRef?.current?.currentTime;
+      const newProgress = videoRef.current?.currentTime;
       setCurrentTime(newProgress);
       if(Math.floor(newProgress) % 10 == 0) {
         handleSendLastProgress({ progress : Math.floor(newProgress), videoId : currentVideo?.videoId });
@@ -160,20 +169,20 @@ export const VideoPlayer = ({ currentVideo, handleExpandedView, playingOnMount =
       setVideoLoaded(true);
     };
 
-    videoRef?.current?.addEventListener('loadedmetadata', handleLoadedMetadata);
-    videoRef?.current?.addEventListener('timeupdate', handleTimeUpdate);
-    videoRef?.current?.addEventListener('seeking', handleSeeking);
-    videoRef?.current?.addEventListener('seeked', handleSeeked);
-    videoRef?.current?.addEventListener('waiting', handleWaiting);
-    videoRef?.current?.addEventListener('canplay', handleCanPlay);
+    videoRef.current?.addEventListener('loadedmetadata', handleLoadedMetadata);
+    videoRef.current?.addEventListener('timeupdate', handleTimeUpdate);
+    videoRef.current?.addEventListener('seeking', handleSeeking);
+    videoRef.current?.addEventListener('seeked', handleSeeked);
+    videoRef.current?.addEventListener('waiting', handleWaiting);
+    videoRef.current?.addEventListener('canplay', handleCanPlay);
 
     return () => {
-      videoRef?.current?.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      videoRef?.current?.removeEventListener('timeupdate', handleTimeUpdate);
-      videoRef?.current?.removeEventListener('seeking', handleSeeking);
-      videoRef?.current?.removeEventListener('seeked', handleSeeked);
-      videoRef?.current?.removeEventListener('waiting', handleWaiting);
-      videoRef?.current?.removeEventListener('canplay', handleCanPlay);
+      videoRef.current?.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      videoRef.current?.removeEventListener('timeupdate', handleTimeUpdate);
+      videoRef.current?.removeEventListener('seeking', handleSeeking);
+      videoRef.current?.removeEventListener('seeked', handleSeeked);
+      videoRef.current?.removeEventListener('waiting', handleWaiting);
+      videoRef.current?.removeEventListener('canplay', handleCanPlay);
     };
   }, [currentVideo]);
 
@@ -204,34 +213,37 @@ export const VideoPlayer = ({ currentVideo, handleExpandedView, playingOnMount =
         (!playing || (isHovering && !mouseInactive)) && videoLoaded && (
           <Controls 
             playing={playing} 
-            videoRef={videoRef}
-            currentTime={currentTime}
-            playbackRate={currentRate}
-            currentVolume={currentVolume}
-            handlePlayVideo={handlePlay}
-            handleFullScreen={handleFullScreen}
-            playSecond={currentVideo?.playSecond}
-            handleSpeedChange={handleSpeedChange}
-            handleExpandedView={handleExpandedView}
+            videoRef={videoRef} 
+            currentTime={currentTime} 
+            playbackRate={currentRate} 
+            handlePlayVideo={handlePlay} 
+            currentVolume={currentVolume} 
+            handleFullScreen={handleFullScreen} 
+            playSecond={currentVideo?.playSecond} 
+            handleSpeedChange={handleSpeedChange} 
+            handleExpandedView={handleExpandedView} 
             className="absolute bottom-0 left-0 z-4" 
-            handleCurrentVolume={handleCurrentVolume}
-            handleForwardTenSecs={handleForwardTenSecs}
-            handleProgressChange={handleProgressChange}
-            handleBackwardTenSecs={handleBackwardTenSecs}
-            handleToggleCurrentVolume={handleToggleCurrentVolume}
+            handleCurrentVolume={handleCurrentVolume} 
+            handleForwardTenSecs={handleForwardTenSecs} 
+            handleProgressChange={handleProgressChange} 
+            handleBackwardTenSecs={handleBackwardTenSecs} 
+            handleToggleCurrentVolume={handleToggleCurrentVolume} 
           />
         )
       }
-      { !playing && !loading && <PauseOverlay handlePlay={handlePlay} /> }
+      { (!currentVideo || videoError) && !loading && <ErrorOverlay handleReloadVideo={handleReloadVideo} /> }
+      { currentVideo && !playing && !loading && !videoError && <PauseOverlay handlePlay={handlePlay} /> }
       { loading && <LoadingOverlay handlePlay={handlePlay} /> }
-      <video
-        className="w-full h-full z-2"
-        width="100%"
-        ref={videoRef}
-        src={currentVideo?.videoLink}
-        onClick={handlePlay}
-        controls={false}
-        poster={!alreadyPlayed && currentVideo?.poster}
+      { expandedView && (!playing || (playing && isHovering)) && <ExpandView onClick={() => handleExpandedView(false)} /> }
+      <video 
+        width="100%" 
+        ref={videoRef} 
+        controls={false} 
+        onClick={handlePlay} 
+        className="w-full h-full z-2" 
+        src={currentVideo?.videoLink} 
+        onError={handleVideoError}
+        poster={!alreadyPlayed && currentVideo?.poster} 
       />
     </div>
   )
@@ -256,7 +268,19 @@ const PauseOverlay = ({ handlePlay }) => (
   </motion.div>
 )
 
-const LoadingOverlay = ({ handlePlay }) => (
+const ErrorOverlay = ({ handleReloadVideo }) => (
+  <motion.div 
+    className='z-3 absolute top-0 left-0 w-full flex flex-column gap-3 justify-content-center align-items-center text-white text-3xl' 
+    style={{ backgroundColor : 'rgba(0,0,0,0.3)', height : '100%' }}
+    initial={{ opacity: 0 }}
+    whileInView={{ opacity: 1 }}
+  >
+    No se pudo cargar el video.
+    <Button text label="Reintentar" icon="pi pi-sync" severity='info' rounded onClick={handleReloadVideo} />
+  </motion.div>
+)
+
+const LoadingOverlay = ({ handlePlay, expandedView }) => (
   <motion.div 
     className='z-3 absolute top-0 left-0 w-full h-full flex justify-content-center align-items-center' 
     style={{ backgroundColor : 'rgba(0,0,0,0.3)' }}
@@ -271,4 +295,15 @@ const LoadingOverlay = ({ handlePlay }) => (
       <i className='pi pi-spin pi-spinner text-7xl font-bold text-transparent' />
     </div> */}
   </motion.div>
+)
+
+
+const ExpandView = ({ onClick }) => (
+  <div 
+    onClick={onClick}
+    style={{ top : 40 }}
+    className='absolute right-0 p-3 flex align-items-center justify-content-start w-4rem h-2rem bg-gray-400 hover:bg-gray-300 transition-all transition-duration-200 transition-ease-out cursor-pointer z-3' 
+  >
+    <i className='pi pi-arrow-left text-gray-700' />
+  </div>
 )

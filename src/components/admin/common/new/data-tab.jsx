@@ -54,8 +54,6 @@ export const CursosTab = ({
           throw 'Method save not implemented yet'
       }
 
-      console.log(currentRelatedDataToAdd)
-
       handleUpdateRelatedDataFromData(currentRelatedDataToAdd);
       setCurrentRelatedDataToAdd(null);
       setAddingNewRelatedData(false);

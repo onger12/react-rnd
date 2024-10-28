@@ -1,22 +1,15 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 
-import { useParams } from 'wouter';
+import { useLocation, useParams } from 'wouter';
 
-import { TabMenu } from 'primereact/tabmenu';
 import { OverlayPanel } from 'primereact/overlaypanel';
 
 import { useLearn } from '../../hooks';
 import { RootContext } from '../../App';
-import { VideoPlayer } from '../../components';
 import { LearnWrapper } from '../../wrappers';
+import { VideoPlayer } from '../../components';
 import { ctc, UpdateVideoProgress } from '../../helpers';
 import { ScrolledPanel } from '../../components/video-player/scrolled-panel';
-
-const tabItems = [
-  { label: '', icon: 'pi pi-search' },
-  { label: 'Descripción general', icon: '' },
-  { label: 'Preguntas', icon: '' },
-];
 
 export const CourseScreen = () => {
 
@@ -24,7 +17,6 @@ export const CourseScreen = () => {
   const [currentVideo, setCurrentVideo] = useState(null);
   const [currentVideos, setCurrentVideos] = useState([]);
   const [expandedView, setExpandedView] = useState(false);
-  const [currentCourse, setCurrentCourse] = useState(null);
 
   // context
   const { handleLoaders } = useContext(RootContext);
@@ -34,29 +26,27 @@ export const CourseScreen = () => {
   const toastRef = useRef(null);
 
   // hooks
-  const { schoolId, dni, courseId } = useParams();
-  const { schools, getSchoolsByUser, getCourseHeadByUser, getCoursesByUser, courses : allCourses } = useLearn({ toastRef, handleLoaders });
-
-  // state
-  // const currentCourse = history.state;
+  const { dni, courseId, company } = useParams();
+  const [n, navigate] = useLocation();
+  const { getCoursesByUser, courses } = useLearn({ toastRef, handleLoaders });
 
   // handlers
+  const hanldeGoSchoolScreen = () => {
+    if(courses[0]?.schoolId == null) return;
+    navigate(`/${company}/learn/${dni}/schools/${courses[0]?.schoolId}`);
+  }
   const handleUpdateVideoProgressInList = (body) => {
     const vds = [...currentVideos];
     const index = vds?.findIndex(t => t?.videoId == body?.videoId);
     if(index >= 0) {
       vds[index] = {...vds[index], playSecond : body?.playSecond};
       setCurrentVideos(vds);
-      history.replaceState({...currentCourse, videos : vds}, '');
+      history.replaceState({...courses[0], videos : vds}, '');
     }
   }
   const handleInitScreen = async () => {
     if(!dni || !courseId) return;
-    getCoursesByUser({ document : dni });
-    // const course = await getCourseHeadByUser({ id : courseId, headers : { document : dni } });
-    // setCurrentCourse(course);
-    // setCurrentVideo(course?.videos[0])
-    getSchoolsByUser({ document : dni });
+    getCoursesByUser({ document : dni, courseId });
   }
 
   const handleExpandedView = () => setExpandedView(t => !t);
@@ -85,20 +75,12 @@ export const CourseScreen = () => {
   }, [dni, courseId]);
 
   useEffect(() => {
-    if(allCourses?.length > 0) {
-      const cc = allCourses?.find(t => t?.courseId == courseId);
-      setCurrentCourse(cc);
-      setCurrentVideo(cc?.videos[0] ?? null);
-    }
-  }, [allCourses]);
+    setCurrentVideo(courses[0]?.videos[0] ?? null);
+  }, [courses]);
 
   return (
     <LearnWrapper toastRef={toastRef}>
-      <div className="min-h-screen">
-        <div className='py-2'>
-          <h1 className='my-0'>{currentCourse?.courseName}</h1>
-          <span className='font-italic'>{schools?.find(t => t.schoolId == schoolId)?.schoolName}</span>
-        </div>
+      <div className="py-2">
         <div className='flex'>
           <div className={`${expandedView ? 'w-full' : 'w-9'}`}>
             <VideoPlayer 
@@ -107,10 +89,41 @@ export const CourseScreen = () => {
               handleExpandedView={handleExpandedView}
               handleSendLastProgress={handleSendLastProgress}
             />
-            <TabMenu model={tabItems} className='mx-3' activeIndex={1} />
-            <div className='py-3 px-5'>
-              <span className='block text-2xl pb-3'>{currentVideo?.videoName}</span>
-              <div className='flex gap-5 align-items-center'>
+            <div className='py-3 px-2'>
+              {
+                courses?.length > 0 && (
+                  <div className='flex flex-column gap-2'>
+                    <span className='block mb-1 text-2xl font-bold'>{currentVideo?.videoName}</span>
+                    <div className='flex gap-2 align-items-center'>
+                      <span 
+                        className={`
+                          course-misc-profile-size 
+                          flex 
+                          align-items-center 
+                          justify-content-center 
+                          border-circle 
+                          bg-gray-600 
+                          text-white 
+                          hover:bg-gray-700 
+                          transition-all 
+                          transition-ease-out 
+                          transition-duration-200 
+                          text-gray-100
+                          ${courses[0]?.schoolId != null ? 'cursor-pointer' : ''}`
+                        }
+                        onClick={hanldeGoSchoolScreen}
+                      >
+                        {courses[0]?.courseName?.slice(0, 2)?.toUpperCase()}
+                      </span>
+                      <div className=''>
+                        <span className='block font-semibold text-xl'>{courses[0]?.courseName}</span>
+                        <span className='block font-light text-md text-gray-400'>{courses[0]?.schoolName}</span>
+                      </div>
+                    </div>
+                  </div>
+                )
+              }
+              {/* <div className='flex gap-5 align-items-center'>
                 <div className=''>
                   <span className='font-bold text-sm block'>4.5 <i className='pi pi-star text-yellow-400' /></span>
                   <span className='text-xs block'>50 calificaciones</span>
@@ -124,14 +137,15 @@ export const CourseScreen = () => {
                   <span className='text-xs block'>Total</span>
                 </div>
 
-              </div>
+              </div> */}
+              {/* <TabMenu model={tabItems} className='mx-3' activeIndex={1} /> */}
             </div>
-            <div style={{ height : 500, width : '100%' }} />
+            {/* <div style={{ height : 500, width : '100%' }} /> */}
           </div>  
           <ScrolledPanel 
             currentVideo={currentVideo} 
             expandedView={expandedView} 
-            videos={currentCourse?.videos} 
+            videos={courses[0]?.videos} 
             handleExpandedView={handleExpandedView} 
             handleCurrentVideo={handleCurrentVideo} 
           />

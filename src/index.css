@@ -137,6 +137,25 @@ a {
   max-height: 600px;
 }
 
+.course-misc-profile-size {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.scrolled-panel-max-height {
+  max-height: calc(100vh - 4.5rem);
+}
+
+.hover-cursor-text {
+  cursor: text;
+}
+.hover-cursor-text:hover .button-hidden-child {
+  opacity: 100 !important;
+}
+
+.hover-cursor-text:hover .div-input-child {
+  border: 1px solid gray !important;
+}
 
 /* fonts */
 .font-big-title {

@@ -36,32 +36,21 @@ export const AssigmentsScreen = () => {
 
   return (
     <LearnWrapper>
-      {/* {
-        courses?.map(school => (
-          <div key={school?.id} className='p-1 px-3 border-1 border-transparent hover:border-gray-200 border-round-md'>
-            <h1 className='my-0 text-gray-500 font-italic select-none'>{school?.name}</h1>
-            <div className='w-full grid gap-2 p-2 my-2'>
-              {
-                courses?.courses?.map(course => (
-                    <InfoCard key={course?.courseId} {...course} qtyDetail={`${handleGetRandom(10)}/${handleGetRandom(15) + 10} capitulos completados`} />
-                  ))
-              }
-            </div>
-          </div>
-        ))
-      } */}
-      {
-        courses?.map(course => (
-          <CourseInfoCard 
-            data={{...course }}
-            id={course?.courseId}
-            key={course?.courseId} 
-            name={course?.courseName ?? 'NOMBRE'}
-            description={course?.courseDescription ?? 'DESCRIPCION'}
-            qtyDetail={handleGetCourseProgress(course)}
-          />
-        ))
-      }
+      <h1 className='mt-2 select-none'>Cursos en todas las escuelas</h1>
+      <div className='w-full grid gap-2 p-2'>
+        {
+          courses?.map(course => (
+            <CourseInfoCard 
+              data={{...course }}
+              id={course?.courseId}
+              key={course?.courseId} 
+              name={course?.courseName ?? 'NOMBRE'}
+              description={course?.courseDescription ?? 'DESCRIPCION'}
+              qtyDetail={handleGetCourseProgress(course)}
+            />
+          ))
+        }
+      </div>
       {
         courses?.length == 0 && !loaders?.courses && (
           <div className='w-full flex flex-column align-items-center justify-content-center' style={{ height : '60vh'}}>

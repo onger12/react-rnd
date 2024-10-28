@@ -4,11 +4,11 @@ import { SingleVideoCard } from './single-video-card';
 export const ScrolledPanel = ({ expandedView, currentVideo, videos, handleExpandedView, handleCurrentVideo }) => {
 
   return (
-    <div className={`flex flex-column max-h-screen sticky top-0 ${expandedView ? 'w-0' : 'flex-grow-1'} transition-all transition-duration-200 transition-ease-out overflow-hidden`}>
+    <div className={`flex flex-column h-full scrolled-panel-max-height ${expandedView ? 'w-0' : 'flex-grow-1'} transition-all transition-duration-200 transition-ease-out overflow-hidden`}>
       <div className='border-1 border-gray-200 flex justify-content-between align-items-center px-2 py-3'>
         <span className='text-xl font-bold'>Contenido del curso</span>
         <i
-          className='pi pi-times'
+          className='pi pi-times cursor-pointer p-2 border-circle hover:bg-gray-200 transition-all transition-ease-out transition-duration-200'
           onClick={handleExpandedView}
         />
       </div>

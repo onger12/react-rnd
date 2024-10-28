@@ -9,6 +9,8 @@ export * from './admin/common/table';
 export * from './admin/common/edit/edit-dialog';
 export * from './admin/common/new/new-dialog';
 
+export * from './admin/courses/new-exam-dialog';
+
 export * from './common/button';
 export * from './common/header-main';
 export * from './common/footer-main';

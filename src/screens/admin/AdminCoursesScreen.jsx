@@ -8,7 +8,7 @@ import { useAdmin } from '../../hooks';
 import { RootContext } from '../../App';
 import { AdminWrapper } from '../../wrappers';
 import { ctc, DeleteCourse } from '../../helpers';
-import { EditDialog, NewDialog } from '../../components';
+import { EditDialog, NewDialog, NewExamDialog } from '../../components';
 
 const formData = [
   { label : 'Nombre', required : true, type : 'InputText', inputKey : 'courseName' },
@@ -24,6 +24,7 @@ const relatedDataFields = [
 
 export const AdminCoursesScreen = () => {
 
+  const [addingExam, setAddingExam] = useState(null);
   const [addingNewCourse, setAddingNewCourse] = useState(false);
   const [currentCourseToEdit, setCurrentCourseToEdit] = useState(null);
 
@@ -57,8 +58,8 @@ export const AdminCoursesScreen = () => {
       const videos_ = [...body, ...courses_[index]?.videos];
       courses_[index] = { ...courses_[index], videos : videos_, videosCount : videos_?.length };
 
-      handleCourses(schools_);
-      setCurrentCourseToEdit(schools_[index]);
+      handleCourses(courses_);
+      setCurrentCourseToEdit(courses_[index]);
     }
   }
   const handleUpdateCourseInState = (c) => {
@@ -126,6 +127,17 @@ export const AdminCoursesScreen = () => {
         className='w-2rem h-2rem'
         onClick={() => setCurrentCourseToEdit(row)}
         pt={{ icon : { style : { fontSize : 12 } } }}
+      />
+      <Button 
+        text
+        rounded
+        icon="pi pi-book"
+        severity='secondary'
+        className='w-2rem h-2rem'
+        onClick={() => setAddingExam(true)}
+        pt={{ icon : { style : { fontSize : 12 } } }}
+        tooltip='Ver cuestionario'
+        tooltipOptions={{ position : 'bottom' }}
       />
       <Button 
         text 
@@ -256,6 +268,13 @@ export const AdminCoursesScreen = () => {
         onHide={() => setAddingNewCourse(false)} 
         relatedDataKeyDescription="courseDescription"
         initialFormState={{ courseName: '', courseDescription : '' }} 
+      />
+
+      
+
+      <NewExamDialog 
+        visible={addingExam}
+        onHide={() => setAddingExam(null)}
       />
     </AdminWrapper>
   )

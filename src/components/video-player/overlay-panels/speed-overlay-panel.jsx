@@ -96,7 +96,7 @@ const DropdownMenu = ({ show, direction, children }) => (
       dropdown-button-centered 
       bg-gray-800
       shadow-2 
-      z-5
+      z-4
     `}
   >
     {children}

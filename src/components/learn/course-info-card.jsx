@@ -4,10 +4,10 @@ export const CourseInfoCard = ({ name, description, id, qtyDetail, data }) => {
   
   const [location, setLocation] = useLocation();
 
-  const { dni } = useParams();
+  const { dni, company } = useParams();
 
   // handlers
-  const handleShowDetail = () => setLocation(`/learn/${dni}/courses/${id}`, { state : data });
+  const handleShowDetail = () => setLocation(`/${company}/learn/${dni}/courses/${id}`, { state : data });
 
   return (
     <div className='col cursor-pointer min-w-20rem border-round-xl flex flex-column justify-content-between p-3 h-auto border-1 border-gray-200 hover:border-gray-300' onClick={handleShowDetail}>

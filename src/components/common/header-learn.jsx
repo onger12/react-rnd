@@ -24,7 +24,7 @@ export const HeaderLearn = () => {
   return (
     <>
       <div className="w-full h-3rem bg-transparent" />
-      <header className="bg-white fixed top-0 w-full px-4 h-3rem flex align-items-center justify-content-between">
+      <header className="bg-white fixed top-0 w-full px-4 h-3rem flex align-items-center justify-content-between z-5">
         <nav className="flex align-items-center gap-4 sm:gap-6">
           <Link href={`/${company}/learn/${dni}`} className="flex align-items-center justify-content-center">
             {
@@ -35,13 +35,13 @@ export const HeaderLearn = () => {
           </Link>
           <Link 
             href={`/${company}/learn/${dni}/schools`} 
-            className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline ${active ? 'underline' : ''} underline-offset-4`}  
+            className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline ${(active || location?.includes('schools')) ? 'underline' : ''} underline-offset-4`}  
           >
             Escuelas
           </Link>
           <Link 
             href={`/${company}/learn/${dni}/assigments`} 
-            className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline ${active ? 'underline' : ''} underline-offset-4`}  
+            className={(active) => `transition-all transition-duration-200 transition-ease-in text-sm font-medium hover:underline ${(active || location?.includes('courses')) ? 'underline' : ''} underline-offset-4`}  
           >
             Asignados
           </Link>

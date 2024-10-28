@@ -6,7 +6,7 @@ import { DataTable } from "primereact/datatable";
 import { MultiSelect } from "primereact/multiselect";
 
 import { RootContext } from "../../../../App";
-import { AddCoursesToUser, AddCourseToSchool, AddVideosToCourse, ctc, RemoveCourseFromSchool, RemoveUserFromColab, RemoveVideoFromCourse } from "../../../../helpers";
+import { AddCoursesToUser, AddCourseToSchool, AddVideosToCourse, ctc, handleGetRelatedDataKeyPlural, RemoveCourseFromSchool, RemoveUserFromColab, RemoveVideoFromCourse } from "../../../../helpers";
 import { BodyDescription } from "../body-description";
 
 export const CursosTab = ({ 
@@ -33,8 +33,7 @@ export const CursosTab = ({
   // BD
   const handleDoneAddNewRelatedData = async () => {
     handleLoaders({ addRelatedData : true });
-    const [l] = relatedDataKeyId?.toLowerCase()?.trim()?.split('id');
-    const key = `${l}sIds`;
+    const key = `${handleGetRelatedDataKeyPlural({ relatedDataId : relatedDataKeyId })}Ids`
     try {
       const body = {
         [dataKeyId] : dataId,

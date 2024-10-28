@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ctc, GetCourseHead, GetCourses, GetCoursesByUser, GetSchoolHead, GetSchools, GetSchoolsByUser } from "../helpers";
+import { ctc, GetCourseHead, GetCoursesByUser, GetSchoolHead, GetSchoolsByUser } from "../helpers";
 
 export const useLearn = ({ toastRef, handleLoaders }) => {
   const [currentSchool, setCurrentSchool] = useState(null);

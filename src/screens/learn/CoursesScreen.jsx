@@ -4,24 +4,25 @@ import { useLocation, useParams } from "wouter";
 
 import { useLearn } from "../../hooks";
 import { RootContext } from "../../App";
-import { CourseInfoCard } from "../../components";
 import { LearnWrapper } from "../../wrappers";
+import { CourseInfoCard } from "../../components";
 
 export const CoursesScreen = () => {
 
-  const { handleLoaders, loaders } = useContext(RootContext);
+  const { handleLoaders } = useContext(RootContext);
 
   // refs
   const toastRef = useRef(null);
 
   // hooks
-  const { schoolId, dni } = useParams();
   const [l, setLocation] = useLocation();
-  const { courses : coursesState } = history.state;
-  const { currentSchool, getSchoolHeadByUser } = useLearn({ toastRef, handleLoaders });
+  const { schoolId, dni, company } = useParams();
+  const { currentSchool, getSchoolHeadByUser, getSchoolsByUser, schools : schoolsByUser } = useLearn({ toastRef, handleLoaders });
+  
+  const { courses : coursesState } = history.state || schoolsByUser?.find(t => t?.schoolId == schoolId) || {};
 
   // handlers
-  const handleClickSchoolName = () => setLocation(`/learn/${dni}/schools`);
+  const handleClickSchoolName = () => setLocation(`/${company}/learn/${dni}/schools`);
   const handleInitScreen = () => getSchoolHeadByUser({ id : schoolId, headers : { document : dni } });
   const handleGetCourseProgress = (videos) => {
     if(!videos || !Array.isArray(videos) || videos?.length == 0) return 'Sin capítulos';
@@ -44,6 +45,12 @@ export const CoursesScreen = () => {
 
     return `${completed}/${total} capítulos completados`;
   }
+
+  useEffect(() => {
+    if(!coursesState) {
+      getSchoolsByUser({ document : dni });
+    }
+  }, [coursesState]);
 
   useEffect(() => {
     handleInitScreen();
@@ -69,8 +76,8 @@ export const CoursesScreen = () => {
                   id={course?.courseId}
                   key={course?.courseId} 
                   name={course?.courseName}
-                  description={course?.courseDescription}
                   data={{...course, videos}}
+                  description={course?.courseDescription}
                   qtyDetail={handleGetCourseProgress(videos)}
                 />
               )

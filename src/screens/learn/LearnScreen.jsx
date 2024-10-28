@@ -7,19 +7,21 @@ import { DataTable } from 'primereact/datatable';
 
 import { LearnWrapper } from "../../wrappers";
 import { getRamdonCourses, getRamdonSchools, schools } from "../../data";
+import { Button } from "primereact/button";
 
 export const LearnScreen = () => {
 
   const [currentSchools, setCurrentSchools] = useState([]);
   const [currentCourses, setCurrentCourses] = useState([]);
 
-  const { dni } = useParams();
+  const { dni, company } = useParams();
   const [location, setLocation] = useLocation();
 
   // refs
   const tableChangeBgHover = useRef('hover:bg-gray-100 transition-all transition-duration-100 transition-ease-in').current;
 
   // handlers
+  const handleNavigateReviwe = () => setLocation(`/${company}/learn/${dni}/review`);
   const handleShowSchoolDetail = (id) => setLocation(`${location}/schools/${id}`);
 
   // bodys
@@ -52,8 +54,8 @@ export const LearnScreen = () => {
 
   return (
     <LearnWrapper>
-      <section className="flex flex-wrap md:flex-nowrap align-items-start gap-2">
-        <div className="border-round-xl border-1 p-4 border-gray-100 w-full md:w-8">
+      <section className="flex flex-wrap md:flex-nowrap align-items-start gap-2 pt-3">
+        <div className="border-round-xl border-1 p-4 pb-3 border-gray-100 w-full md:w-8">
           <h1 className="font-bold mb-1 mt-0">Tus cursos</h1>
           <p className="py-0 mt-1 mb-3">Aquí tienes un resumen de tus más recientes cursos.</p>
           <DataTable
@@ -87,6 +89,9 @@ export const LearnScreen = () => {
               align="center"
             />
           </DataTable>
+          <div className="w-full flex align-items-center justify-content-end mt-3 mb-0">
+            <Button label="Más..." icon="pi pi-arrow-right" iconPos="right" onClick={handleNavigateReviwe} size="small" severity="secondary" text />
+          </div>
         </div>
         <div className="border-round-xl border-1 p-4 border-gray-100 w-full md:w-4">
           <h2 className="mt-0 mb-3">Escuelas en las que tienes cursos</h2>
