@@ -17,7 +17,7 @@ const formData = [
 const relatedDataFields = [
   { field : 'courseName', header : 'Nombre', sortable : true, filter : true },
   { field : 'courseDescription', header : 'Descripción', sortable : true, filter : true, body : 'description' },
-  { field : 'usersCount', header : 'Estudiantes inscritos', align : 'right' },
+  { field : '', header : '% Completado', align : 'right' },
   { field : 'actions', header : 'Acciones', align : 'center', include : ['remove'] },
 ]
 

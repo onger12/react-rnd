@@ -7,7 +7,7 @@ import { DataTable } from 'primereact/datatable';
 import { useAdmin } from '../../hooks';
 import { RootContext } from '../../App';
 import { AdminWrapper } from '../../wrappers';
-import { ctc, DeleteCourse } from '../../helpers';
+import { ctc, DeleteCourse, handleToastDone } from '../../helpers';
 import { EditDialog, NewDialog, NewExamDialog } from '../../components';
 
 const formData = [
@@ -37,6 +37,15 @@ export const AdminCoursesScreen = () => {
   const { getVideos, getCourses, videos, courses, handleCourses } = useAdmin({ handleLoaders, toastRef });
 
   // handlers
+  const handleAddExamToCourseInState = ({ exam }) => {
+    const cs = [...courses];
+    const index = cs?.findIndex(t => t?.courseId == exam?.courseId);
+    if(index >= 0) {
+      cs[index].exams = [exam];
+      handleCourses(cs);
+      handleToastDone({ detail : `El cuestionario fue agregado con éxito al curso ${cs[index]?.courseName}`, ref : toastRef });
+    }
+  }
   const handleRemoveVideoFromCourse = ({ body }) => {
     if(!body?.courseId || !body?.videoId) return;
     const courses_ = [...courses];
@@ -134,7 +143,7 @@ export const AdminCoursesScreen = () => {
         icon="pi pi-book"
         severity='secondary'
         className='w-2rem h-2rem'
-        onClick={() => setAddingExam(true)}
+        onClick={() => setAddingExam(row?.exams[0] ?? { courseId : row?.courseId, addingNew : true })}
         pt={{ icon : { style : { fontSize : 12 } } }}
         tooltip='Ver cuestionario'
         tooltipOptions={{ position : 'bottom' }}
@@ -268,13 +277,12 @@ export const AdminCoursesScreen = () => {
         onHide={() => setAddingNewCourse(false)} 
         relatedDataKeyDescription="courseDescription"
         initialFormState={{ courseName: '', courseDescription : '' }} 
-      />
-
-      
+      />      
 
       <NewExamDialog 
         visible={addingExam}
         onHide={() => setAddingExam(null)}
+        handleExamCourseInState={handleAddExamToCourseInState}
       />
     </AdminWrapper>
   )

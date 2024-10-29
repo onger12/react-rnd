@@ -80,8 +80,10 @@ export const CourseScreen = () => {
   }, [dni, courseId]);
 
   useEffect(() => {
-    setCurrentVideos(courses[0]?.videos ?? []);
-    setCurrentItem(courses[0]?.videos[0] ?? null);
+    if(courses?.length > 0 && courses[0]?.videos?.length > 0) {
+      setCurrentVideos([...courses[0]?.videos, courses[0]?.exams[0]] ?? []);
+      setCurrentItem(courses[0]?.videos[0] ?? null);
+    }
   }, [courses]);
 
   return (
@@ -167,10 +169,11 @@ export const CourseScreen = () => {
                 )
               }
               <ScrolledPanel 
-                videos={currentVideos} 
                 expandedView={expandedView} 
                 handleCurrentItem={handleCurrentItem} 
                 handleExpandedView={handleExpandedView} 
+                exam={currentVideos?.find(t => t?.examId != null)}
+                videos={currentVideos?.filter(t => t?.examId == null)} 
                 currentItem={{...currentItem, id : (currentItem?.videoId || currentItem?.examId)}} 
               />
             </div>

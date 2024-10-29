@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
 import uuid from "react-uuid";
 
@@ -11,21 +11,23 @@ import { DataTable } from "primereact/datatable";
 import { TabPanel, TabView } from "primereact/tabview";
 import { ToggleButton } from "primereact/togglebutton";
 import { InputTextarea } from "primereact/inputtextarea";
-
-import { useForm } from "../../../hooks";
-import { handleToastDone } from "../../../helpers";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 
-const ca = { toAddNews : true, id : 0, isCorrect : false, answerTitle : '' };
+import { useForm } from "../../../hooks";
+import { RootContext } from "../../../App";
+import { AddExam, ctc, EditExam, handleToastDone } from "../../../helpers";
+
+const ca = { toAddNews : true, id : 0, isCorrect : false, answer : '' };
 const initialAddQuestion = {
   id : 0,
   adding : true,
-  questionTitle : '',
+  question : '',
   answers : [{...ca}],
 };
 
-export const NewExamDialog = ({ visible, onHide }) => {
-  
+export const NewExamDialog = ({ visible, onHide, handleExamCourseInState }) => {
+
+  const [itemsToAdd, setItemsToAdd] = useState([]);
   const [currentTabIndex, setCurrentTabIndex] = useState(0);
   const [isEditingAnswerTitle, setIsEditingAnswerTitle] = useState(null);
   const [disableButonSaveExam, setDisableButonSaveExam] = useState(false);
@@ -36,6 +38,9 @@ export const NewExamDialog = ({ visible, onHide }) => {
     title : '',
     description : '',
   });
+
+  // contexts
+  const { handleLoaders, loaders } = useContext(RootContext);
 
   // refs
   const toastRef = useRef(null);
@@ -55,6 +60,26 @@ export const NewExamDialog = ({ visible, onHide }) => {
   // handlers
   const handleHide = () => {
     onHide && onHide();
+    setItemsToAdd([]);
+    setCurrentQuestions([{...initialAddQuestion}]);
+  }
+  const handleItemsToAdd = ({ item, replaceAllIsCorrects }) => {
+    let ita = [...itemsToAdd];
+    if(replaceAllIsCorrects) {
+      ita = ita?.map(t => t?.questNum == item?.questNum ? ({ ...t, isCorrect : false }) : t);
+      const index = ita?.findIndex(t => t?.id == item?.id);
+      if(index >= 0) {
+        ita[index].isCorrect = item?.isCorrect;
+        setItemsToAdd(ita);
+        return;
+      }
+    }
+    const found = ita.find(t => t?.id == item?.id);
+    if(found) {
+      setItemsToAdd(ita?.filter(t => t?.id != item?.id));
+    } else {
+      setItemsToAdd([item, ...ita]);
+    }
   }
   const handleValidateButtonSaveExamDisable = () => {
     let flag = false;
@@ -69,7 +94,7 @@ export const NewExamDialog = ({ visible, onHide }) => {
     if(qIndex >= 0) {
       const l = cq.slice(0, qIndex);
       const r = cq.slice(qIndex + 1);
-      handleQuestions([...l, {...initialAddQuestion, answers : initialAddQuestion?.answers?.map(t => ({...t, answerTitle : ''})) }, {...(newQuestion ?? {})}, ...r]);
+      handleQuestions([...l, {...initialAddQuestion, answers : initialAddQuestion?.answers?.map(t => ({...t, answer : ''})) }, {...(newQuestion ?? {})}, ...r]);
       handleToastDone({ detail : 'Pregunta agregada correctamente.', ref : toastRef });
     }
   }
@@ -78,18 +103,22 @@ export const NewExamDialog = ({ visible, onHide }) => {
     const qIndex = qs?.findIndex(t => t?.id == currentQuestions[currentTabIndex]?.id);
     if(qIndex >= 0) {
       const ca_ = qs[qIndex]?.answers?.find(t => t?.id == 0);
-      qs[qIndex].answers = [{...ca}, ({ answerTitle : ca_?.answerTitle, isCorrect : ca_?.isCorrect, id : uuid(), questionId : 0 }), ...qs[qIndex]?.answers?.filter(t => t?.id != 0)];
+      const newAnswer = {answer : ca_?.answer, isCorrect : ca_?.isCorrect, id : uuid(), questionId : 0}
+      qs[qIndex].answers = [{...ca}, newAnswer, ...qs[qIndex]?.answers?.filter(t => t?.id != 0)];
       handleQuestions(qs);
+      if(currentQuestions[currentTabIndex]?.questNum) {
+        handleItemsToAdd({ item : {...newAnswer, questNum : currentQuestions[currentTabIndex]?.questNum }});
+      }
     }
     setIsEditingAnswerTitle(null);
   }
   const gcq = () => currentQuestions?.find(t => t?.adding);
-  const handleChangeQuestionTitle = ({ event, question }) => {
+  const handleChangequestion = ({ event, question }) => {
     const { value } = event?.target ?? {};
     const qs = [...currentQuestions];
     const qIndex = qs.findIndex(t => t?.id == question?.id);
     if(qIndex >= 0) {
-      qs[qIndex].questionTitle = value;
+      qs[qIndex].question = value;
       handleQuestions(qs);
     }
   }
@@ -100,7 +129,7 @@ export const NewExamDialog = ({ visible, onHide }) => {
     if(qIndex >= 0) {
       const aIndex = qs[qIndex]?.answers?.findIndex(t => t?.id == answer?.id);
       if(aIndex >= 0) {
-        qs[qIndex].answers[aIndex].answerTitle = value;
+        qs[qIndex].answers[aIndex].answer = value;
         handleQuestions(qs);
       }
     }
@@ -113,50 +142,29 @@ export const NewExamDialog = ({ visible, onHide }) => {
       if(aIndex >= 0) {
         qs[qIndex].answers = qs[qIndex].answers?.map((t,i) => ({...t, isCorrect : isCorrect ? aIndex == i : false }));
         handleQuestions(qs);
+        if(currentQuestions[currentTabIndex]?.questNum) {
+          handleItemsToAdd({ item : { ...answer, isCorrect : !answer?.isCorrect, questNum : currentQuestions[currentTabIndex]?.questNum }, replaceAllIsCorrects : true });
+        }
       }
     }
   }
   const handleQuestions = (qs) => setCurrentQuestions(qs);
   const handleAddNewQuestion = () => {
-    onChangeManual({ questionTitle : '' });
+    onChangeManual({ question : '' });
     const cq = currentQuestions?.find(t => t?.id == initialAddQuestion?.id);
     const newQuestion = {
-      questionTitle : formState?.questionTitle,
+      id : uuid(),
       answers : cq.answers,
+      question : formState?.question,
     }
     handleResetAddQuestion({ newQuestion });
-  }
-  const handleAddNewAnswerToQuestion = ({ answer, question }) => {
-    if(!answer || !question?.id) return;
-    const qs = [...currentQuestions];
-    const qIndex = qs.findIndex(t => t?.id == question?.id);
-    if(qIndex >= 0) {
-      qs[qIndex].answers = [answer, ...(qs[qIndex]?.answers ?? [])];
-      handleQuestions(qs);
-    }
-  }
-  const handleEditAnswerInQuestion = ({ answer, question }) => {
-    if(!answer?.id || !question?.id) return;
-    const qs = [...currentQuestions];
-    const qIndex = qs.findIndex(t => t?.id == question?.id);
-    if(qIndex >= 0) {
-      const as = [...qs[qIndex]?.answers];
-      const aIndex = as.findIndex(t => t?.id == answer?.id);
-      if(aIndex >= 0) {
-        as[aIndex] = {...answer};
-        qs[qIndex].answers = as;
-        handleQuestions(qs);
-      }
-    }
+    handleItemsToAdd({ item : newQuestion });
   }
   const handleRemoveAnswerFromQuestion = ({ answer }) => {
     if(!answer?.id) return;
     const qs = [...currentQuestions];
-    const qIndex = qs.findIndex(t => t?.id == (answer?.questionId ?? 0));
-    if(qIndex >= 0) {
-      qs[qIndex].answers = qs[qIndex]?.answers?.filter(t => t?.id != answer?.id);
-      handleQuestions(qs);
-    }
+    qs[currentTabIndex].answers = qs[currentTabIndex]?.answers?.filter(t => t?.id != answer?.id);
+    handleQuestions(qs);
   }
   const handleRemoveQuestion = ({ question }) => {
     if(!question?.id && currentTabIndex == null) return;
@@ -164,13 +172,90 @@ export const NewExamDialog = ({ visible, onHide }) => {
     if(question?.id) {
       const qs = currentQuestions?.filter(t => t?.id != (question?.id || currentQuestions[currentTabIndex]?.id));
       handleQuestions(qs);
-      return;
+    } else {
+      const l = currentQuestions.slice(0, currentTabIndex);
+      const r = currentQuestions.slice(currentTabIndex + 1);
+      handleQuestions([...l, ...r]);
+    }
+    
+    handleItemsToAdd({ item : question });
+    setCurrentTabIndex(currentTabIndex - 1);
+  }
+  const handleSaveMiddleware = (e) => {
+    e?.preventDefault();
+
+    const c = currentQuestions?.find(t => t?.id == 0);
+    if(c) {
+
     }
 
-    const l = currentQuestions.slice(0, currentTabIndex);
-    const r = currentQuestions.slice(currentTabIndex + 1);
-    handleQuestions([...l, ...r]);
-    setCurrentTabIndex(currentTabIndex - 1);
+    if(visible?.addingNew === true) {
+      handleAddExam();
+    } else {
+      handleEditExam();
+    }
+  }
+
+  // BD
+  const handleAddExam = async () => {
+    handleLoaders({ exam : true });
+    try {
+      const body = {
+        courseId : visible?.courseId, 
+        examName : formState?.title, 
+        examDescription : formState?.description, 
+        questions : [...currentQuestions]?.reverse()?.filter(t => !t?.adding)?.map((q, qIndex) => ({
+          questNum : qIndex + 1,
+          question : q?.question,
+          answers : [...q?.answers]?.reverse()?.filter(t => !t?.toAddNews)?.map((a, aIndex) => ({
+            questNum : qIndex + 1,
+            answerNum : aIndex + 1,
+            answer : a?.answer,
+            isCorrectAnswer : a?.isCorrect,
+          }))
+        }))
+      }
+
+      const { examId } = await AddExam(body);
+      handleExamCourseInState && handleExamCourseInState({ exam : {...body, examId}, add : true });
+      handleHide();
+    } catch (e) {
+      ctc(e, 'Hubo un error al guardar el cuestionario', toastRef);
+    } finally {
+      handleLoaders({ exam : false });
+    }
+  }
+  const handleEditExam = async () => {
+    handleLoaders({ exam : true });
+
+    try {
+      const body = {
+        examId : visible?.examId,
+        courseId : visible?.courseId, 
+        examName : formState?.title, 
+        examDescription : formState?.description, 
+        questions : [...currentQuestions]?.reverse()?.filter(t => !t?.adding)?.map((q, qIndex) => ({
+          questNum : qIndex + 1,
+          examId : visible?.examId,
+          question : q?.question,
+          answers : [...q?.answers]?.reverse()?.filter(t => !t?.toAddNews)?.map((a, aIndex) => ({
+            examId : visible?.examId,
+            questNum : qIndex + 1,
+            answerNum : aIndex + 1,
+            answer : a?.answer,
+            isCorrectAnswer : a?.isCorrect,
+          }))
+        }))
+      }
+
+      await EditExam(body);
+      handleExamCourseInState && handleExamCourseInState({ exam : {...body, examId}, edit : true });
+      handleHide();
+    } catch (e) {
+      ctc(e, 'Hubo un error al guardar el cuestionario', toastRef);      
+    } finally {
+      handleLoaders({ exam : false });
+    }
   }
 
   // bodys
@@ -182,7 +267,8 @@ export const NewExamDialog = ({ visible, onHide }) => {
             rows={1} 
             className="w-full" 
             autoFocus={autoFocus} 
-            value={answer?.answerTitle} 
+            value={answer?.answer} 
+            onBlur={() => setIsEditingAnswerTitle(false)}
             disabled={answer?.toAddNews && !!isEditingAnswerTitle} 
             onChange={(event) => handleChangeAnswerTitle({ event, answer })} 
             placeholder={answer?.toAddNews ? "Agrega una nueva opción aquí..." : "No puedes dejar este campo vacío!"} 
@@ -196,7 +282,7 @@ export const NewExamDialog = ({ visible, onHide }) => {
                   severity="secondary" 
                   className="w-2rem h-2rem" 
                   onClick={() => setIsEditingAnswerTitle(false)} 
-                  disabled={answer?.answerTitle == null || answer?.answerTitle?.length == 0 || (answer?.toAddNews && !!isEditingAnswerTitle)} 
+                  disabled={answer?.answer == null || answer?.answer?.length == 0 || (answer?.toAddNews && !!isEditingAnswerTitle)} 
                 />
               )
               : (
@@ -206,7 +292,7 @@ export const NewExamDialog = ({ visible, onHide }) => {
                   severity="secondary"
                   className="w-2rem h-2rem"
                   onClick={handleAddNewAnswerInStage}
-                  disabled={answer?.answerTitle == null || answer?.answerTitle?.length == 0 || (answer?.toAddNews && !!isEditingAnswerTitle)}
+                  disabled={answer?.answer == null || answer?.answer?.length == 0 || (answer?.toAddNews && !!isEditingAnswerTitle)}
                 />
               )
           }
@@ -220,7 +306,7 @@ export const NewExamDialog = ({ visible, onHide }) => {
           onClick={() => setIsEditingAnswerTitle(answer)}
           className="border-round-sm border-1 border-transparent p-2 w-full div-input-child transition-all transition-ease-out transition-duration-200"
         >
-          {answer?.answerTitle}
+          {answer?.answer}
         </div>
         <Button 
           rounded
@@ -248,20 +334,23 @@ export const NewExamDialog = ({ visible, onHide }) => {
     return (
       <div className="flex align-items-center gap-2 pt-4">
         <Button 
-          outlined
-          label="Cancelar"
-          icon="pi pi-times"
-          className="w-full"
-          severity="secondary"
-          onClick={handleHide}
+          outlined 
+          label="Cancelar" 
+          icon="pi pi-times" 
+          className="w-full" 
+          severity="secondary" 
+          onClick={handleHide} 
+          disabled={loaders?.exam} 
         />
         <Button 
-          icon="pi pi-save"
-          className="w-full"
-          severity="secondary"
-          form="exam-create-form"
-          label="Guardar cuestionario"
-          disabled={disableButonSaveExam}
+          icon="pi pi-save" 
+          className="w-full" 
+          severity="secondary" 
+          form="exam-create-form" 
+          loaders={loaders?.exam} 
+          loading={loaders?.exam} 
+          label="Guardar cuestionario" 
+          disabled={disableButonSaveExam || loaders?.exam} 
         />
       </div>
     )
@@ -270,21 +359,50 @@ export const NewExamDialog = ({ visible, onHide }) => {
   useEffect(() => {
     setDisableButonSaveExam(handleValidateButtonSaveExamDisable());
   }, [currentQuestions, formState?.title, formState?.description]);
+  
+  useEffect(() => {
+    if(visible) {
+      onChangeManual({
+        title : visible?.examName,
+        description : visible?.examDescription,
+      });
+
+      const qs = (visible?.questions ?? [])?.map(q => ({
+        ...q,
+        id : uuid(),
+        answers : [
+          {...ca},
+          ...(q?.answers ?? [])?.map(a => ({
+            ...a,
+            isCorrect : a?.isCorrectAnswer,
+            id : uuid(),
+          }))
+        ]
+      }));
+
+      setCurrentQuestions(t => ([
+        ...t,
+        ...[...qs]?.reverse(),
+      ]))
+    }
+  }, [visible]);
 
   return (
     <Dialog 
       visible={visible} 
       footer={BodyFooter} 
       onHide={handleHide} 
+      closeOnEscape={false}
       className="w-10 xl:w-8" 
+      closable={!loaders?.exam}
       style={{ height : '95vh' }} 
       contentClassName="pt-3 pb-0" 
       headerClassName="py-2 px-4 border-bottom-1 border-gray-100" 
-      header={formState?.title ? formState?.title : "Cuestionario nuevo"} 
+      header={formState?.title ? formState?.title : visible?.addingNew ? "Cuestionario nuevo" : "Editar cuestionario"} 
     >
-      <form id="exam-create-form" className="w-full flex flex-column" onSubmit={e => e?.preventDefault()}>
+      <form id="exam-create-form" className="w-full flex flex-column" onSubmit={handleSaveMiddleware}>
         <label className="w-full">
-          <span className="block">Título del cuestionario<span className="text-red-400 font-bold">*</span></span>
+          <span className="block text-md">Título del cuestionario<span className="text-red-400 font-bold">*</span></span>
           <InputText 
             autoFocus
             name="title"
@@ -295,7 +413,7 @@ export const NewExamDialog = ({ visible, onHide }) => {
           />
         </label>
         <label className="w-full">
-          <span className="block">Descripción del cuestionario<span className="text-red-400 font-bold">*</span></span>
+          <span className="block text-md">Descripción del cuestionario<span className="text-red-400 font-bold">*</span></span>
           <InputTextarea 
             rows={3}
             name="description"
@@ -320,24 +438,24 @@ export const NewExamDialog = ({ visible, onHide }) => {
             BodyIsCorrect={BodyIsCorrect} 
             BodyAnswerTitle={BodyAnswerTitle}
             currentQuestions={currentQuestions} 
-            questionTitle={formState?.questionTitle} 
+            question={formState?.question} 
             handleAddNewQuestion={handleAddNewQuestion} 
           />
         </TabPanel>
         {
           currentQuestions?.filter(t => !t?.adding)?.map((t, i) => (
-            <TabPanel header={`Pregunta #${currentQuestions?.filter(t => !t?.adding)?.length - i}`} key={uuid()}>
+            <TabPanel header={`Pregunta #${currentQuestions?.filter(t => !t?.adding)?.length - i}`} key={t?.id}>
               <QuestionForm 
-                question={t}
+                data={t} 
                 answers={t?.answers} 
                 formState={formState} 
+                question={t?.question} 
                 BodyIsCorrect={BodyIsCorrect} 
-                questionTitle={t?.questionTitle} 
+                onChange={handleChangequestion} 
                 BodyAnswerTitle={BodyAnswerTitle} 
                 currentQuestions={currentQuestions} 
-                onChange={handleChangeQuestionTitle} 
                 handleAddNewQuestion={handleAddNewQuestion} 
-                handleRemoveQuestion={confirmRemoveQuestion}
+                handleRemoveQuestion={confirmRemoveQuestion} 
               />
             </TabPanel>
           ))
@@ -350,10 +468,10 @@ export const NewExamDialog = ({ visible, onHide }) => {
   )
 }
 
-const QuestionForm = ({ onChange, questionTitle, handleAddNewQuestion, currentQuestions, BodyAnswerTitle, BodyIsCorrect, answers, isNewQuestion, question, handleRemoveQuestion }) => (
+const QuestionForm = ({ onChange, data, handleAddNewQuestion, currentQuestions, BodyAnswerTitle, BodyIsCorrect, answers, isNewQuestion, question, handleRemoveQuestion }) => (
   <div className="w-full" style={{ height : '45vh' }}>
     <label className="w-full">
-      <span>Encabezado de la pregunta<span className="text-red-400 font-bold">*</span></span>
+      <span className="text-md">Encabezado de la pregunta<span className="text-red-400 font-bold">*</span></span>
     </label>
     <div className="flex w-full gap-2">
       <InputTextarea 
@@ -364,11 +482,11 @@ const QuestionForm = ({ onChange, questionTitle, handleAddNewQuestion, currentQu
             onChange && onChange(event);
             return;
           }
-          onChange && onChange({event, question })
+          onChange && onChange({event, question : data })
         }} 
-        name="questionTitle" 
-        value={questionTitle} 
-        autoFocus={!isNewQuestion} 
+        name="question" 
+        value={question} 
+        // autoFocus={!isNewQuestion} 
         placeholder="Describe la pregunta..." 
       />
       {
@@ -389,7 +507,7 @@ const QuestionForm = ({ onChange, questionTitle, handleAddNewQuestion, currentQu
               // }
               onClick={handleAddNewQuestion}
               tooltipOptions={{ position : 'top', showDelay : 250 }} 
-              disabled={!questionTitle || !currentQuestions?.find(t => t?.id == 0)?.answers || currentQuestions?.find(t => t?.id == 0)?.answers?.length == 0 || currentQuestions?.find(t => t?.id == 0)?.answers?.every(t => !t?.isCorrect)} 
+              disabled={!question || !currentQuestions?.find(t => t?.id == 0)?.answers || currentQuestions?.find(t => t?.id == 0)?.answers?.length == 0 || currentQuestions?.find(t => t?.id == 0)?.answers?.every(t => !t?.isCorrect)} 
             />
           )
           : (
@@ -406,13 +524,13 @@ const QuestionForm = ({ onChange, questionTitle, handleAddNewQuestion, currentQu
               //       ? 'Debe agregar al menos una respuesta' 
               //       : ''
               // }
-              onClick={(event) => handleRemoveQuestion({ event, question })}
+              onClick={(event) => handleRemoveQuestion({ event, question : data })}
               tooltipOptions={{ position : 'top', showDelay : 250 }} 
             />
           )
       }
     </div>
-    <h3 className="mt-3 mb-2">Opciones de respuestas</h3>
+    <span className="block mt-3 mb-2 text-md">Opciones de respuestas</span>
     <DataTable
       scrollable
       size="small"
@@ -421,15 +539,17 @@ const QuestionForm = ({ onChange, questionTitle, handleAddNewQuestion, currentQu
       scrollHeight="35vh"
     >
       <Column
-        field="answerTitle"
+        field="answer"
         header="Opción"
+        headerClassName="text-xs"
         body={(answer) => BodyAnswerTitle({ answer, autoFocus : isNewQuestion })}
-      />
+        />
       <Column
         field="isCorrect"
         header="Es correcta"
-        body={(answer) => BodyIsCorrect({ answer })}
         bodyClassName="w-8rem"
+        headerClassName="text-xs"
+        body={(answer) => BodyIsCorrect({ answer })}
       />
     </DataTable>
   </div>

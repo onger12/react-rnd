@@ -119,7 +119,7 @@ const questionsDummy = [
   },
 ]
 
-export const ResolveExam = ({ questions = questionsDummy, expandedView, formTitle = 'Titulo del cuestionario', handleDoneIntent }) => {
+export const ResolveExam = ({ questions = questionsDummy, examDescription, expandedView, examName = 'Titulo del cuestionario', handleDoneIntent }) => {
 
   const [completed, setCompleted] = useState([]);
   const [currentTabIndex, setCurrentTabIndex] = useState(0);
@@ -166,10 +166,10 @@ export const ResolveExam = ({ questions = questionsDummy, expandedView, formTitl
   return (
     <div className={`${!expandedView ? 'w-9' : 'w-full'} exam-resolve-height`}>
       <div className="w-full h-4rem px-3 flex align-items-center justify-content-between border-bottom-1 border-gray-200">
-        <span className="block font-medium">{formTitle}</span>
-        <span className="block font-medium">Intento 1 de 1</span>
+        <span className="block font-medium">{examName}</span>
+        <span className="block font-medium">Tienes varios intentos</span>
         <div className="flex align-items-center gap-2">
-          <span className="block font-medium">5:39 Mins Restantes</span>
+          <span className="block font-medium">Tomate tu tiempo</span>
           <i className="pi pi-clock" />
         </div>
       </div>
@@ -181,10 +181,28 @@ export const ResolveExam = ({ questions = questionsDummy, expandedView, formTitl
           panelContainer : { style : { padding : 0, margin : 0 } }
         }}
       >
+        <TabPanel 
+          header="Inicio"
+          pt={{ headerAction : { style : { borderBottom : currentTabIndex == 0 ? '2px solid #d3eac8' : '' } } }}
+        >
+          <div className="w-full bg-gray-100 py-4 flex flex-column justify-content-between" style={{ minHeight : '60vh' }}>
+            <div className="w-10 mx-auto">
+              <h1>{examName}</h1>
+              <span className="block w-full">{examDescription}</span>
+            </div>
+            <div className="w-10 mx-auto flex align-items-center justify-content-center gap-2 mt-5">
+              <Button 
+                severity="secondary"
+                onClick={handleNextTab}
+                label="Iniciar cuestionario"
+              />
+            </div>
+          </div>
+        </TabPanel>
         {
           questions?.map((t, i) => (
-            <TabPanel key={t?.questionId} header={i + 1} pt={{ headerAction : { style : { borderBottom : i == currentTabIndex ? '2px solid #d3eac8' : completed?.find(t => t?.questionIndex == i) ? '3px solid #82bd69' : '' } } }}>
-              <div className="w-full bg-gray-100 py-4">
+            <TabPanel key={t?.questionId} header={i + 1} pt={{ headerAction : { style : { borderBottom : i + 1 == currentTabIndex ? '2px solid #d3eac8' : completed?.find(t => t?.questionIndex == i) ? '3px solid #82bd69' : '' } } }}>
+              <div className="w-full bg-gray-100 py-4 flex flex-column justify-content-evenly" style={{ minHeight : '60vh' }}>
                 <div className="w-10 mx-auto">
                   <span className="block text-2xl font-medium text-gray-700">
                     {t?.questionDescription}
@@ -201,9 +219,9 @@ export const ResolveExam = ({ questions = questionsDummy, expandedView, formTitl
                   <Button 
                     severity="secondary"
                     onClick={handleNextTab}
-                    iconPos={currentTabIndex + 1 == questions?.length ? "left" : "right"}
-                    icon={currentTabIndex + 1 == questions?.length ? 'pi pi-save' : 'pi pi-arrow-right'}
-                    label={currentTabIndex + 1 == questions?.length ? "Terminar intento" : "Siguiente pregunta"}
+                    iconPos={currentTabIndex == questions?.length ? "left" : "right"}
+                    icon={currentTabIndex == questions?.length ? 'pi pi-save' : 'pi pi-arrow-right'}
+                    label={currentTabIndex == questions?.length ? "Terminar intento" : "Siguiente pregunta"}
                   />
                 </div>
               </div>

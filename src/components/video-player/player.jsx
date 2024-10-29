@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Controls } from './';
 import { Button } from 'primereact/button';
 
-export const VideoPlayer = ({ currentVideo, handleExpandedView, playingOnMount = false, handleSendLastProgress, expandedView }) => {
+export const VideoPlayer = ({ currentItem : currentVideo, handleExpandedView, playingOnMount = false, handleSendLastProgress, expandedView }) => {
 
   const [loading, setLoading] = useState(true);
   const [currentRate, setCurrentRate] = useState(1);

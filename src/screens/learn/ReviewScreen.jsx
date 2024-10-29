@@ -1,45 +1,44 @@
-import { DataTable } from "primereact/datatable"
-import { LearnWrapper } from "../../wrappers"
-import { Column } from "primereact/column"
+import { useContext, useEffect, useRef, useState } from "react";
+
+import { useParams } from "wouter";
+
+import { useLearn } from "../../hooks";
+import { RootContext } from "../../App";
+import { LearnWrapper } from "../../wrappers";
+import { InfoCoursesTable, InfoCourseTable, InfoSchoolsTable } from "../../components";
+import { Toast } from "primereact/toast";
 
 export const ReviewScreen = () => {
+  const [currentCourseSelected, setCurrentCourseSelected] = useState(null);
+
+  // context
+  const { handleLoaders } = useContext(RootContext);
+  
+  // refs
+  const toastRef = useRef(null);
+
+  // hooks
+  const { dni } = useParams();
+  const { courses, schools, getSchoolsByUser, getCoursesByUser } = useLearn({ toastRef, handleLoaders });
+
+  // handlers
+  const handleSelectCourse = (course) => setCurrentCourseSelected(course);
+
+  useEffect(() => {
+    getCoursesByUser({ document : dni });
+    getSchoolsByUser({ document : dni });
+  }, []);
+
   return (
     <LearnWrapper>
-      <div className="border-round-xl border-1 p-4 border-gray-100 w-full md:w-8">
-        <h1 className="font-bold mb-1 mt-0">Tus cursos</h1>
-        <p className="py-0 mt-1 mb-3">Aquí tienes un resumen de tus más recientes cursos.</p>
-        <DataTable
-          value={currentCourses.slice(0,3)}
-          rowClassName={tableChangeBgHover}
-          size="small"
-          emptyMessage="No tienes cursos asignados aún"
-          // showGridlines
-        >
-          <Column  
-            header="Curso"
-            field="name"
-            headerClassName={`bg-white ${tableChangeBgHover}`}
-            body={BodyCourse}
-          />
-          {
-            window.innerWidth > 420 && (
-              <Column  
-                header="Progreso"
-                field="progress"
-                headerClassName={`bg-white min-w-12rem w-4rem ${tableChangeBgHover}`}
-                body={BodyProgress}
-              />
-            )
-          }
-          <Column  
-            header="Calificación"
-            field="grade"
-            headerClassName={`bg-white w-5rem ${tableChangeBgHover}`}
-            body={BodyGrade}
-            align="center"
-          />
-        </DataTable>
+      <div className="mt-3 flex gap-2 flex-wrap md:flex-nowrap">
+        <InfoCoursesTable courses={courses} schools={schools} handleSelectCourse={handleSelectCourse} />
+        <div className="w-full md:w-6 flex flex-column gap-2">
+          <InfoSchoolsTable schools={schools} width="w-full" />
+          { currentCourseSelected != null && <InfoCourseTable course={currentCourseSelected} /> }
+        </div>
       </div>
+      <Toast ref={toastRef} />
     </LearnWrapper>
   )
 }

@@ -184,6 +184,16 @@ export function SyncVideos(body) {
     .post("cgh/videos/sync/sharepoint", body)
     .then((response) => response);
 }
+export function AddExam(body) {
+  return client
+    .post("cgh/exams", body)
+    .then((response) => response);
+}
+export function EditExam(body) {
+  return client
+    .put("cgh/exams", body)
+    .then((response) => response);
+}
 
 // learn
 export function GetSchoolsByUser({params, headers}) {

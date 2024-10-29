@@ -12,7 +12,7 @@ const dummyExam = {
   questionsLength : 12,
 }
 
-export const ScrolledPanel = ({ expandedView, currentItem, videos, handleExpandedView, handleCurrentItem, exam = dummyExam }) => {
+export const ScrolledPanel = ({ expandedView, currentItem, videos, handleExpandedView, handleCurrentItem, exam }) => {
 
   return (
     <div 
@@ -71,6 +71,7 @@ export const ScrolledPanel = ({ expandedView, currentItem, videos, handleExpande
           {...exam}
           onClick={() => handleCurrentItem(exam)} 
           active={currentItem?.id == exam?.examId} 
+          index={(Number(videos?.length) + 1) ?? 0}
         />
       </div>
     </div>

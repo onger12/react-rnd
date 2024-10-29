@@ -33,5 +33,8 @@ export * from './paper/paper-area-work';
 
 export * from './learn/info-card';
 export * from './learn/course-info-card';
+export * from './learn/info-course-table';
+export * from './learn/info-schools-table';
+export * from './learn/info-courses-table';
 
 export * from './video-player';
