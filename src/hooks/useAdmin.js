@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { ctc, DeleteSchool, GetCourseHead, GetCourses, GetSchoolHead, GetSchools, GetUsers, GetVideos, SyncVideos } from "../helpers";
+import { ctc, DeleteSchool, GetAdminInfo, GetCourseHead, GetCourses, GetSchoolHead, GetSchools, GetUsers, GetVideos, ReorderVideosCourse, SyncVideos } from "../helpers";
 
 export const useAdmin = ({ toastRef, handleLoaders } = {}) => {
 
@@ -52,10 +52,13 @@ export const useAdmin = ({ toastRef, handleLoaders } = {}) => {
       handleLoaders({ schoolHead : false });
     }
   }
-  const getCourses = async (params) => {
+  const getCourses = async (params, headers, returnData) => {
     try {
       handleLoaders({ courses : true });
-      const courses = await GetCourses(params);
+      const courses = await GetCourses(params, headers);
+
+      if(returnData) return courses;
+
       handleCourses(courses);
     } catch (e) {
       ctc(e, 'Hubo un error al consultar los cursos.', toastRef);
@@ -107,6 +110,27 @@ export const useAdmin = ({ toastRef, handleLoaders } = {}) => {
       handleLoaders({ syncVideos : false });
     }
   }
+  const getAdminInfo = async (params) => {
+    try {
+      handleLoaders({ adminInfo : true });
+      return await GetAdminInfo(params);
+    } catch (e) {
+      ctc(e, 'Hubo un error al consultar la info general.', toastRef);
+    } finally {
+      handleLoaders({ adminInfo : false });
+    }
+  }
+  const reorderVideosCourse = async ({ body, onError }) => {
+    try {
+      handleLoaders({ reorderVideos : true });
+      return await ReorderVideosCourse(body);
+    } catch (e) {
+      ctc(e, 'Hubo un error al reordenar los videos en la base de datos.', toastRef);
+      onError && onError();
+    } finally {
+      handleLoaders({ reorderVideos : false });
+    }
+  }
 
   return ({
     users,
@@ -121,11 +145,13 @@ export const useAdmin = ({ toastRef, handleLoaders } = {}) => {
     getCourses,
     syncVideos,
     handleUsers,
+    getAdminInfo,
     deleteSchool,
     handleVideos,
     handleSchools,
     handleCourses,
     getCourseHead,
     getSchoolsHead,
+    reorderVideosCourse,
   })
 }

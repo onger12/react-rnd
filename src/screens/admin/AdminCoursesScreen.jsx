@@ -16,10 +16,10 @@ const formData = [
 ]
 
 const relatedDataFields = [
-  { field : 'videoName', header : 'Nombre', sortable : true, filter : true },
-  { field : 'videoDescription', header : 'Descripción', sortable : true, filter : true, body : 'description' },
-  { field : 'usersCount', header : 'Estudiantes inscritos', align : 'right' },
-  { field : 'actions', header : 'Acciones', align : 'center', include : ['remove'] },
+  { field : 'videoName', header : 'Nombre', sortable : true, filter : true, default : 'Datos no cargados' },
+  { field : 'videoDescription', header : 'Descripción', sortable : true, filter : true, body : 'description', default : 'Datos no cargados' },
+  { field : 'usersCount', header : 'Estudiantes inscritos', align : 'right', default : 'Datos no cargados' },
+  { field : 'actions', header : 'Acciones', align : 'center', include : ['remove'], default : 'Datos no cargados' },
 ]
 
 export const AdminCoursesScreen = () => {
@@ -34,9 +34,28 @@ export const AdminCoursesScreen = () => {
   const toastRef = useRef(null);
 
   // hooks
-  const { getVideos, getCourses, videos, courses, handleCourses } = useAdmin({ handleLoaders, toastRef });
+  const { getVideos, getCourses, videos, courses, handleCourses, reorderVideosCourse } = useAdmin({ handleLoaders, toastRef });
 
   // handlers
+  const handleReorderVideosCourseInState = async ({ data }) => {
+    const cs = [...courses];
+    const index = cs?.findIndex(t => t?.courseId == currentCourseToEdit?.courseId);
+    if(index >= 0) {
+      const originalVideos = cs[index].videos;
+      cs[index].videos = [...data];
+      setCurrentCourseToEdit({...cs[index]});
+      handleCourses(cs);
+      
+      await reorderVideosCourse({ body : { 
+        courseId : cs[index]?.courseId,
+        videosIds : data?.map(t => t?.videoId),
+      }, onError : () => {
+        cs[index].videos = [originalVideos];
+        setCurrentCourseToEdit({...cs[index]});
+        handleCourses(cs);
+      }});
+    }
+  }
   const handleAddExamToCourseInState = ({ exam }) => {
     const cs = [...courses];
     const index = cs?.findIndex(t => t?.courseId == exam?.courseId);
@@ -244,6 +263,7 @@ export const AdminCoursesScreen = () => {
       /> */}
       
       <EditDialog 
+        allowReorder
         dataId="courseId" 
         formData={formData} 
         dataName="courseName" 
@@ -258,26 +278,29 @@ export const AdminCoursesScreen = () => {
         onHide={() => setCurrentCourseToEdit(false)} 
         handleUpdateData={handleUpdateCourseInState} 
         relatedDataKeyDescription="courseDescription" 
+        handleReorderRelatedData={handleReorderVideosCourseInState}
         handleRemoveRelatedDataFromData={handleRemoveVideoFromCourse} 
         handleUpdateRelatedDataFromData={handleUpdateCourseFromSchool} 
         initialFormState={{ courseName: currentCourseToEdit?.courseName, courseDescription : currentCourseToEdit?.courseDescription }} 
       />
       <NewDialog 
+        allowReorder 
         dataId="courseId" 
         formData={formData} 
         dataName="courseName" 
         secondTabTitle="Videos" 
         relatedDataId="videoId" 
         allRelatedData={videos} 
-        dialogTitle="Nuevo Curso"
+        dialogTitle="Nuevo Curso" 
         visible={!!addingNewCourse} 
         relatedDataKeyName="videoName" 
-        relatedDataFields={relatedDataFields}
+        relatedDataFields={relatedDataFields} 
         handleAddNewEntity={handleAddNewCourse} 
         onHide={() => setAddingNewCourse(false)} 
-        relatedDataKeyDescription="courseDescription"
+        relatedDataKeyDescription="courseDescription" 
+        handleReorderRelatedData={handleReorderVideosCourseInState} 
         initialFormState={{ courseName: '', courseDescription : '' }} 
-      />      
+      />
 
       <NewExamDialog 
         visible={addingExam}

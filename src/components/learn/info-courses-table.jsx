@@ -5,6 +5,7 @@ import { useLocation, useParams } from "wouter";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
+import { BodyProgress } from "../common/body-progress";
 
 export const InfoCoursesTable = ({ courses, schools, handleSelectCourse, resume }) => {
   
@@ -20,16 +21,18 @@ export const InfoCoursesTable = ({ courses, schools, handleSelectCourse, resume 
 
   // bodys
   const BodyCourse = (row) => (
-    <div className="flex flex-column justify-content-center h-full">
-      <p className="text-gray-900 font-bold mb-1">{row?.courseName}</p>
-      <p className="text-gray-400 font-light mt-1">{schools?.find(t => t.id == row?.schoolId)?.schoolName}</p>
-    </div>
-  )
-  const BodyProgress = (row) => (
-    <div className="flex align-items-center h-full">
-      <div className="w-full h-05rem border-round-xl bg-gray-400">
-        <div className="h-05rem border-round-xl bg-gray-900 z-3" style={{ width : `${row?.videosWatchedPercent}%` }} />
+    <div className="flex justify-content-between align-items-center">
+      <div className={`flex flex-column justify-content-center h-full ${!resume ? 'w-9' : 'w-full'}`}>
+        <p className="text-gray-900 font-bold mb-1">{row?.courseName}</p>
+        <p className="text-gray-400 font-light mt-1">{schools?.find(t => t.id == row?.schoolId)?.schoolName}</p>
       </div>
+      {
+        !resume && (
+          <div className="w-3 flex align-items-center text-gray-400 hover:text-gray-900 h-full transition-all transition-duration-200 transition-ease-out">
+            <i className="pi pi-eye" />
+          </div>
+        )
+      }
     </div>
   )
   const BodyGrade = (row, data) => (
@@ -39,7 +42,7 @@ export const InfoCoursesTable = ({ courses, schools, handleSelectCourse, resume 
   )
 
   return (
-    <div className="border-round-xl border-1 p-4 border-gray-100 w-full md:w-6">
+    <div className="border-round-xl shadow-1 p-4 w-full md:w-6">
       <h2 className="font-bold mb-1 mt-0">Tus cursos</h2>
       {resume && <p className="py-0 mt-1 mb-3 text-md">Aquí tienes un resumen de tus más recientes cursos.</p>}
       {!resume && <p className="py-0 mt-1 mb-3 text-md">Aquí tienes un resumen de tus cursos.</p>}
@@ -63,8 +66,9 @@ export const InfoCoursesTable = ({ courses, schools, handleSelectCourse, resume 
             <Column  
               field="progress" 
               header="Progreso" 
-              body={BodyProgress} 
+              style={{ widht : '12rem', maxWidth : '12rem' }}
               headerClassName={`bg-white w-10rem ${tableChangeBgHover}`} 
+              body={row => <BodyProgress field="videosWatchedPercent" row={row} />} 
             />
           )
         }

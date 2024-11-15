@@ -1,4 +1,6 @@
 export const formatTimeHHMMSS = (timeInSeconds) => {
+  console.log(timeInSeconds);
+  if(Number.isNaN(Math.floor(timeInSeconds))) return '00:00';
   const time = Math.floor(timeInSeconds);
   const hours = Math.floor(time / 3600);
   const minutes = Math.floor((time % 3600) / 60);

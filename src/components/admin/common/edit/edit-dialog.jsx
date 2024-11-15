@@ -4,30 +4,32 @@ import { Toast } from "primereact/toast";
 import { Dialog } from "primereact/dialog";
 import { TabPanel, TabView } from "primereact/tabview";
 
-import { CursosTab } from "./data-tab";
+import { DataTab } from "./data-tab";
 import { useForm } from "../../../../hooks";
 import { InfoGeneralTab } from "./info-general-tab";
 
 export const EditDialog = ({ 
-  data,
-  dataId,
-  onHide,
+  data, 
+  dataId, 
+  onHide, 
   visible, 
-  formData,
-  disabled,
-  dataName,
+  formData, 
+  disabled, 
+  dataName, 
   relatedData, 
-  dialogTitle,
-  relatedDataId,
-  allRelatedData,
-  secondTabTitle,
-  relatedDataKeyName,
-  handleUpdateData,
-  relatedDataFields,
-  initialFormState = {},
-  handleUpdateSingleData,
-  handleRemoveRelatedDataFromData,
-  handleUpdateRelatedDataFromData,
+  dialogTitle, 
+  allowReorder, 
+  relatedDataId, 
+  allRelatedData, 
+  secondTabTitle, 
+  handleUpdateData, 
+  relatedDataFields, 
+  relatedDataKeyName, 
+  initialFormState = {}, 
+  handleUpdateSingleData, 
+  handleReorderRelatedData, 
+  handleRemoveRelatedDataFromData, 
+  handleUpdateRelatedDataFromData, 
   firstTabTitle = "Información general",
 }) => {
   const [currentRelatedData, setCurrentRelatedData] = useState(relatedData);
@@ -63,7 +65,7 @@ export const EditDialog = ({
 
   return (
     <Dialog
-      className="w-8"
+      className="w-10"
       visible={visible}
       onHide={handleHide}
       style={{ minHeight : '60vh' }}
@@ -86,21 +88,23 @@ export const EditDialog = ({
           />
         </TabPanel>
         <TabPanel header={`${secondTabTitle} Asignados (${relatedData?.length ?? 0})`}>
-          <CursosTab 
+          <DataTab 
             dataKeyId={dataId} 
             toastRef={toastRef} 
             disabled={disabled} 
             formData={formData} 
-            entity={secondTabTitle}
-            relatedData={relatedData}
-            allRelatedData={allRelatedData}
-            relatedDataKeyId={relatedDataId}
-            relatedDataKeyName={relatedDataKeyName}
+            entity={secondTabTitle} 
+            relatedData={relatedData} 
+            allowReorder={allowReorder} 
+            allRelatedData={allRelatedData} 
+            relatedDataKeyId={relatedDataId} 
             dataId={data ? data[dataId] : null} 
-            relatedDataFields={relatedDataFields}
-            currentRelatedData={currentRelatedData}
-            handleUpdateRelatedDataFromData={handleUpdateRelatedDataFromData}
-            handleRemoveRelatedDataFromData={handleRemoveRelatedDataFromData}
+            relatedDataFields={relatedDataFields} 
+            relatedDataKeyName={relatedDataKeyName} 
+            currentRelatedData={currentRelatedData} 
+            handleReorderRelatedData={handleReorderRelatedData} 
+            handleUpdateRelatedDataFromData={handleUpdateRelatedDataFromData} 
+            handleRemoveRelatedDataFromData={handleRemoveRelatedDataFromData} 
           />
         </TabPanel>
       </TabView>

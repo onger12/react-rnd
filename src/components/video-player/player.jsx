@@ -14,6 +14,7 @@ export const VideoPlayer = ({ currentItem : currentVideo, handleExpandedView, pl
   const [isHovering, setIsHovering] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoDuration, setVideoDuration] = useState(0);
   const [playing, setPlaying] = useState(playingOnMount);
   const [currentVolume, setCurrentVolume] = useState(70);
   const [mouseInactive, setMouseInactive] = useState(false);
@@ -138,7 +139,7 @@ export const VideoPlayer = ({ currentItem : currentVideo, handleExpandedView, pl
       document.removeEventListener('mozfullscreenchange', handleFullScreenChange);
       document.removeEventListener('MSFullscreenChange', handleFullScreenChange);
     };
-  }, []);
+  }, [currentVideo]);
 
   useEffect(() => {
     if(!currentVideo) return;
@@ -202,6 +203,18 @@ export const VideoPlayer = ({ currentItem : currentVideo, handleExpandedView, pl
     };
   }, [isHovering]);
 
+  useEffect(() => {
+    if(!Number.isNaN(videoRef?.current?.duration)) {
+      console.log(videoRef?.current?.duration)
+      setVideoDuration(videoRef?.current?.duration);
+    } else {
+      setVideoDuration(0);
+    }
+  }, [videoRef?.current?.duration, currentVideo]);
+
+  console.log(videoRef?.current?.duration)
+  console.log(videoDuration)
+  
   return (
     <div 
       onMouseEnter={() => setIsHovering(true)}
@@ -217,6 +230,7 @@ export const VideoPlayer = ({ currentItem : currentVideo, handleExpandedView, pl
             currentTime={currentTime} 
             playbackRate={currentRate} 
             handlePlayVideo={handlePlay} 
+            videoDuration={videoDuration} 
             currentVolume={currentVolume} 
             handleFullScreen={handleFullScreen} 
             playSecond={currentVideo?.playSecond} 
@@ -298,10 +312,10 @@ const LoadingOverlay = ({ handlePlay, expandedView }) => (
 )
 
 
-const ExpandView = ({ onClick }) => (
+export const ExpandView = ({ onClick, position = { top : 40 } }) => (
   <div 
     onClick={onClick}
-    style={{ top : 40 }}
+    style={position}
     className='absolute right-0 p-3 flex align-items-center justify-content-start w-4rem h-2rem bg-gray-400 hover:bg-gray-300 transition-all transition-duration-200 transition-ease-out cursor-pointer z-3' 
   >
     <i className='pi pi-arrow-left text-gray-700' />

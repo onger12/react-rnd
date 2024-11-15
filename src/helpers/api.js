@@ -84,9 +84,9 @@ export function GetSchoolHead({id, headers}) {
     .get(`cgh/schools/${id}`, { headers })
     .then((response) => response);
 }
-export function GetCourses(params) {
+export function GetCourses(params, headers) {
   return client
-  .get("cgh/courses", {params})
+  .get("cgh/courses", {params, headers })
   .then((response) => response);
 }
 export function GetCourseHead({id, headers}) {
@@ -154,9 +154,19 @@ export function GetUsers(params) {
     .get('cgh/users', {params})
     .then((response) => response);
 }
+export function GetAdminInfo(params) {
+  return client
+    .get('cgh/admin/info', {params})
+    .then((response) => response);
+}
 export function EditUsers(body) {
   return client
     .put('cgh/users', body)
+    .then((response) => response);
+}
+export function ReorderVideosCourse(body) {
+  return client
+    .put('cgh/courses/videos', body)
     .then((response) => response);
 }
 export function AddNewUser(body) {
@@ -209,5 +219,15 @@ export function GetCoursesByUser({params, headers}) {
 export function UpdateVideoProgress({body, headers}) {
   return client
     .put("cgh/users/videos/progress", body, {headers})
+    .then((response) => response);
+}
+export function InitExam({body, headers}) {
+  return client
+    .post("cgh/exams/users/start", body, {headers})
+    .then((response) => response);
+}
+export function SendAnswersExam({body, headers}) {
+  return client
+    .post("cgh/exams/users/answer", body, {headers})
     .then((response) => response);
 }

@@ -3,7 +3,7 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 
-import { useAdmin } from '../../hooks';
+import { useAdmin, useLearn } from '../../hooks';
 import { RootContext } from '../../App';
 import { AdminWrapper } from '../../wrappers';
 import { ctc, dateFormat, DeleteUser } from '../../helpers';
@@ -15,10 +15,12 @@ const formData = [
 ]
 
 const relatedDataFields = [
-  { field : 'courseName', header : 'Nombre', sortable : true, filter : true },
-  { field : 'courseDescription', header : 'Descripción', sortable : true, filter : true, body : 'description' },
-  { field : '', header : '% Completado', align : 'right' },
-  { field : 'actions', header : 'Acciones', align : 'center', include : ['remove'] },
+  { field : 'courseName', header : 'Nombre', sortable : true, filter : true, default : 'Datos no cargados' },
+  { field : 'courseDescription', header : 'Descripción', sortable : true, filter : true, body : 'description', default : 'Datos no cargados' },
+  { field : 'videosCount', header : 'Total videos', align : 'right', default : 'Datos no cargados' },
+  { field : 'videosWatchedCount', header : 'Videos vistos', align : 'right', default : 'Datos no cargados' },
+  { field : 'videosWatchedPercent', header : '% Completado', align : 'center', body : 'progress', default : 'Datos no cargados' },
+  { field : 'actions', header : 'Acciones', align : 'center', include : ['remove'], default : 'Datos no cargados' },
 ]
 
 export const AdminColabsScreen = () => {
@@ -32,9 +34,14 @@ export const AdminColabsScreen = () => {
   const toastRef = useRef(null);
 
   // hooks
+  const { getCoursesByUser } = useLearn({ handleLoaders, toastRef });
   const { getUsers, users, getCourses, handleUsers, courses } = useAdmin({ handleLoaders, toastRef });
 
   // handlers
+  const handleCurrentUserEdit = async (user) => {
+    const courses = await getCoursesByUser({ document : user?.document }, null, true);
+    setCurrentColabToEdit({ ...user, courses });
+  }
   const handleUpdateColabInState = (colab) => {
     const colabs = [...users];
     const index = colabs?.findIndex(t => t?.document == colab?.document);
@@ -98,7 +105,7 @@ export const AdminColabsScreen = () => {
         icon="pi pi-pencil"
         severity='secondary'
         className='w-2rem h-2rem'
-        onClick={() => setCurrentColabToEdit(row)}
+        onClick={() => handleCurrentUserEdit(row)}
         pt={{ icon : { style : { fontSize : 12 } } }}
       />
       <Button 
@@ -215,12 +222,12 @@ export const AdminColabsScreen = () => {
         secondTabTitle="Cursos" 
         relatedDataId="courseId" 
         allRelatedData={courses} 
-        dialogTitle="Nuevo Colaborador"
         visible={!!addingNewColab} 
+        dialogTitle="Nuevo Colaborador"
         relatedDataKeyName="courseName" 
         relatedDataFields={relatedDataFields}
-        handleAddNewEntity={handleAddNewColabInState} 
         onHide={() => setAddingNewColab(false)} 
+        handleAddNewEntity={handleAddNewColabInState} 
         relatedDataKeyDescription="courseDescription"
         initialFormState={{ document: '', userName : '' }} 
       />

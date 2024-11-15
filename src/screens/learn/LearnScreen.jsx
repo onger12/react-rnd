@@ -27,7 +27,7 @@ export const LearnScreen = () => {
   return (
     <LearnWrapper>
       <section className="w-full flex gap-2 pt-3 flex-wrap md:flex-nowrap">
-        <InfoCoursesTable courses={courses} schools={schools} resume />
+        <InfoCoursesTable courses={courses?.slice(0, 3)} schools={schools} resume />
         <InfoSchoolsTable schools={schools} />
       </section>
 

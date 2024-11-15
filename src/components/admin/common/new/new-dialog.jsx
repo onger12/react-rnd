@@ -10,22 +10,24 @@ import { InfoGeneralTab } from "./info-general-tab";
 import { handleGetRelatedDataKeyPlural } from "../../../../helpers";
 
 export const NewDialog = ({ 
-  dataId,
-  onHide,
+  dataId, 
+  onHide, 
   visible, 
-  formData,
-  disabled,
-  dataName,
-  relatedDataId,
-  allRelatedData,
-  secondTabTitle,
-  relatedDataFields,
-  handleAddNewEntity,
-  relatedDataKeyName,
-  dialogTitle = 'Nuevo',
-  initialFormState = {},
-  relatedDataKeyDescription,
-  firstTabTitle = "Información general",
+  formData, 
+  disabled, 
+  dataName, 
+  allowReorder, 
+  relatedDataId, 
+  allRelatedData, 
+  secondTabTitle, 
+  relatedDataFields, 
+  handleAddNewEntity, 
+  relatedDataKeyName, 
+  dialogTitle = 'Nuevo', 
+  initialFormState = {}, 
+  handleReorderRelatedData, 
+  relatedDataKeyDescription, 
+  firstTabTitle = "Información general", 
 }) => {
   const [currentData, setCurrentData] = useState(null);
   const [currentTabIndex, setCurrentTabIndex] = useState(0);
@@ -89,7 +91,7 @@ export const NewDialog = ({
 
   return (
     <Dialog
-      className="w-8"
+      className="w-10"
       visible={visible}
       onHide={handleHide}
       style={{ minHeight : '60vh' }}
@@ -116,12 +118,14 @@ export const NewDialog = ({
             disabled={disabled} 
             formData={formData} 
             entity={secondTabTitle} 
+            allowReorder={allowReorder} 
             allRelatedData={allRelatedData} 
             relatedDataKeyId={relatedDataId} 
-            relatedDataKeyName={relatedDataKeyName} 
             relatedDataFields={relatedDataFields} 
+            relatedDataKeyName={relatedDataKeyName} 
             currentRelatedData={currentRelatedData} 
             dataId={currentData ? currentData[dataId] : null} 
+            handleReorderRelatedData={handleReorderRelatedData} 
             relatedDataKeyDescription={relatedDataKeyDescription} 
             handleUpdateRelatedDataFromData={handleUpdateRelatedDataFromData} 
             handleRemoveRelatedDataFromData={handleRemoveRelatedDataFromData} 

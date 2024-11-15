@@ -6,10 +6,15 @@ import { DataTable } from "primereact/datatable";
 import { MultiSelect } from "primereact/multiselect";
 
 import { RootContext } from "../../../../App";
-import { AddCoursesToUser, AddCourseToSchool, AddVideosToCourse, ctc, handleGetRelatedDataKeyPlural, RemoveCourseFromSchool, RemoveUserFromColab, RemoveVideoFromCourse } from "../../../../helpers";
 import { BodyDescription } from "../body-description";
+import { BodyProgress } from "../../../common/body-progress";
+import { 
+  RemoveUserFromColab, RemoveVideoFromCourse, ctc,
+  handleGetRelatedDataKeyPlural, RemoveCourseFromSchool, 
+  AddCoursesToUser, AddCourseToSchool, AddVideosToCourse, 
+} from "../../../../helpers";
 
-export const CursosTab = ({ 
+export const DataTab = ({ 
   data, 
   dataId, 
   entity, 
@@ -17,11 +22,13 @@ export const CursosTab = ({
   toastRef, 
   dataKeyId, 
   relatedData, 
+  allowReorder, 
   relatedDataKeyId, 
   relatedDataFields, 
   relatedDataKeyName, 
   currentRelatedData, 
-  handleUpdateRelatedDataFromData,
+  handleReorderRelatedData,
+  handleUpdateRelatedDataFromData, 
   handleRemoveRelatedDataFromData, 
 }) => {
 
@@ -180,17 +187,32 @@ export const CursosTab = ({
           <DataTable 
             rows={10} 
             size="small" 
-            showGridlines 
+            // showGridlines 
             removableSort 
+            resizableColumns 
             footer={BodyFooter} 
             value={relatedData ?? []} 
+            reorderableRows={allowReorder} 
             scrollable={relatedData?.length > 10} 
             emptyMessage={`No hay ${entity} aún`} 
             virtualScrollerOptions={{ itemSize: 46 }} 
             pt={{ footer : { style : { padding : 0 } } }} 
             scrollHeight={relatedData?.length > 10 ? '50vh' : null} 
             className='w-full border-right-1 border-left-1 p-0 border-gray-200' 
+            onRowReorder={({ value }) => handleReorderRelatedData({ data : value })} 
           >
+            {
+              allowReorder && (
+                <Column 
+                  rowReorder 
+                  align="center" 
+                  style={{ width: '3rem' }} 
+                  className="p-0 m-0"
+                  rowReorderIcon={({iconProps : props}) => <i className={`pi pi-arrows-alt p-3 w-full h-full ${props?.className}`} />} 
+                />
+                // <Column rowReorder align="center" rowReorderIcon={(props) => console.log(props)} style={{ width: '3rem' }} />
+              )
+            }
             {
               relatedDataFields?.map(f => (
                 f?.field == 'actions' 
@@ -205,7 +227,7 @@ export const CursosTab = ({
                     <Column 
                       {...f}
                       key={f?.field}
-                      body={(row) => f?.body == 'description' ? <BodyDescription row={row} field={f?.field} /> : <>{row[f?.field]}</>}
+                      body={(row) => f?.body == 'description' ? <BodyDescription row={row} field={f?.field} /> : f?.body == 'progress' ? <BodyProgress row={row} field={f?.field} /> : <>{row[f?.field] ?? row?.default}</>}
                       style={{ widht : '12rem', maxWidth : '12rem' }}
                     />
                   )

@@ -4,7 +4,7 @@ import { useLocation, useParams } from 'wouter';
 
 import { OverlayPanel } from 'primereact/overlaypanel';
 
-import { useLearn } from '../../hooks';
+import { useAdmin, useLearn } from '../../hooks';
 import { LearnWrapper } from '../../wrappers';
 import { ResolveExam } from '../../components/learn/resolve-exam';
 import { ctc, handleFormatSeconds, UpdateVideoProgress } from '../../helpers';
@@ -14,6 +14,7 @@ import { ErrorPlacing, LoadingPlacing, NoContentPlacing, VideoPlayer } from '../
 export const CourseScreen = () => {
 
   // state
+  const [currentExam, setCurrentExam] = useState(null);
   const [currentItem, setCurrentItem] = useState(null);
   const [currentVideos, setCurrentVideos] = useState([]);
   const [expandedView, setExpandedView] = useState(false);
@@ -30,12 +31,11 @@ export const CourseScreen = () => {
   // hooks
   const { dni, courseId, company } = useParams();
   const [n, navigate] = useLocation();
+  const { getCourses } = useAdmin({ toastRef, handleLoaders });
   const { getCoursesByUser, courses } = useLearn({ toastRef, handleLoaders });
 
   // handlers
-  const handleDoneExamIntent = () => {
-    setCurrentItem(courses[0]?.videos[0]);
-  }
+  const handleUpdateExam = ({ data }) => setCurrentExam(t => ({...t, ...data}));
   const hanldeGoSchoolScreen = () => {
     if(courses[0]?.schoolId == null) return;
     navigate(`/${company}/learn/${dni}/schools/${courses[0]?.schoolId}`);
@@ -52,6 +52,12 @@ export const CourseScreen = () => {
   const handleInitScreen = async () => {
     if(!dni || !courseId) return;
     await getCoursesByUser({ document : dni, courseId }, () => setErrorLoading(true));
+  }
+  const handleGetExam = async () => {
+    const cs = await getCourses({ inactive : false, courseId : courses[0]?.courseId }, { document : dni }, true);
+    const exam = cs[0]?.exams[0]
+    const c = courses[0]?.exams[0];
+    setCurrentExam({ ...exam, startOn : c?.insertOn, endOn : c?.finishesOn, answers : c?.answers ?? [] });
   }
 
   const handleExpandedView = () => setExpandedView(t => !t);
@@ -83,9 +89,11 @@ export const CourseScreen = () => {
     if(courses?.length > 0 && courses[0]?.videos?.length > 0) {
       setCurrentVideos([...courses[0]?.videos, courses[0]?.exams[0]] ?? []);
       setCurrentItem(courses[0]?.videos[0] ?? null);
+
+      handleGetExam();
     }
   }, [courses]);
-
+  
   return (
     <LearnWrapper toastRef={toastRef}>
       <div className="py-2">
@@ -165,15 +173,23 @@ export const CourseScreen = () => {
               }
               {
                 currentItem?.examId != null && (
-                  <ResolveExam expandedView={expandedView} handleDoneIntent={handleDoneExamIntent} />
+                  <ResolveExam 
+                    {...currentExam} 
+                    document={dni} 
+                    toastRef={toastRef} 
+                    expandedView={expandedView} 
+                    courseId={courses[0]?.courseId} 
+                    handleUpdateExam={handleUpdateExam} 
+                    handleExpandedView={handleExpandedView}
+                  />
                 )
               }
               <ScrolledPanel 
+                exam={currentExam}
                 expandedView={expandedView} 
                 handleCurrentItem={handleCurrentItem} 
                 handleExpandedView={handleExpandedView} 
-                exam={currentVideos?.find(t => t?.examId != null)}
-                videos={currentVideos?.filter(t => t?.examId == null)} 
+                videos={currentVideos?.filter(t => t?.videoId != null)} 
                 currentItem={{...currentItem, id : (currentItem?.videoId || currentItem?.examId)}} 
               />
             </div>
@@ -184,7 +200,7 @@ export const CourseScreen = () => {
             ? <ErrorPlacing hScreen />
             : loaders?.courses
               ? <LoadingPlacing hScreen />
-              : currentItem?.videoId == null && currentItem?.examId == null && <NoContentPlacing hScreen text='No se encontraron datos para este curso con este usuario.' />
+              : currentItem?.videoId == null && currentItem?.examId == null && <NoContentPlacing retry={handleInitScreen} hScreen text='No se encontraron datos para este curso con este usuario.' />
         }
 
         <OverlayPanel ref={op} className='border-noround border-1 border-gray-300'>

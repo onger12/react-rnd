@@ -7,20 +7,21 @@ export const Controls = ({
   playing, 
   videoRef, 
   className, 
-  maximized,
+  maximized, 
   playSecond, 
-  currentTime,
+  currentTime, 
   playbackRate, 
-  currentVolume,
+  videoDuration, 
+  currentVolume, 
   handlePlayVideo, 
-  handleFullScreen,
+  handleFullScreen, 
   handleSpeedChange, 
-  handleExpandedView,
-  handleCurrentVolume,
-  handleForwardTenSecs,
+  handleExpandedView, 
+  handleCurrentVolume, 
+  handleForwardTenSecs, 
   handleProgressChange, 
   handleBackwardTenSecs, 
-  handleToggleCurrentVolume,
+  handleToggleCurrentVolume, 
 }) => {
 
   return (
@@ -56,7 +57,7 @@ export const Controls = ({
             onClick={handleForwardTenSecs}
           />
           <span className="select-none text-xl font-bold text-white font-family-quicksand">
-            {formatTimeHHMMSS(currentTime)} / {formatTimeHHMMSS(videoRef?.current?.duration)}
+            {formatTimeHHMMSS(currentTime)} / {formatTimeHHMMSS(videoDuration)}
           </span>
           <IconTooltip 
             icon="pi pi-comment" 

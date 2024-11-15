@@ -20,12 +20,11 @@ export const ScrolledPanel = ({ expandedView, currentItem, videos, handleExpande
         flex 
         flex-column 
         h-full 
-        w-3
         scrolled-panel-max-height 
         transition-all 
         transition-duration-200 
         transition-ease-out overflow-hidden
-        ${expandedView ? 'w-0' : 'flex-grow-1'} 
+        ${expandedView ? 'w-0' : 'w-3'} 
       `}
     >
       <div className='border-1 border-gray-200 flex justify-content-between align-items-center px-2 py-3'>

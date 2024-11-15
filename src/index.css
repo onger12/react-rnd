@@ -134,7 +134,7 @@ a {
   min-width: 20rem;
 }
 .max-h-600px {
-  max-height: 600px;
+  max-height: 480px;
 }
 
 .course-misc-profile-size {
@@ -209,6 +209,13 @@ a {
 }
 .CAP-border-color-color {
   border-color: var(--CAP-color);
+}
+
+.absolute-centering {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 /* .PE-BG-IMAGE {
   background-image: url('/public/PE-BG.png');

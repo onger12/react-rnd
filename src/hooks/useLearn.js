@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ctc, GetCourseHead, GetCoursesByUser, GetSchoolHead, GetSchoolsByUser } from "../helpers";
+import { ctc, GetCourseHead, GetCoursesByUser, GetSchoolHead, GetSchoolsByUser, InitExam, SendAnswersExam } from "../helpers";
 
 export const useLearn = ({ toastRef, handleLoaders }) => {
   const [currentSchool, setCurrentSchool] = useState(null);
@@ -34,10 +34,15 @@ export const useLearn = ({ toastRef, handleLoaders }) => {
       handleLoaders({ currentSchool : false });
     }
   }
-  const getCoursesByUser = async (params, onError) => {
+  const getCoursesByUser = async (params, onError, returnData = null) => {
     handleLoaders({ courses : true });
     try {
       const courses = await GetCoursesByUser({params, headers : params});
+      
+      if(returnData) {
+        return courses;
+      }
+
       handleCourses(courses);
     } catch (e) {
       ctc(e, 'Hubo un error al consultar los cursos.', toastRef);
@@ -56,11 +61,33 @@ export const useLearn = ({ toastRef, handleLoaders }) => {
       handleLoaders({ courseHead : false });
     }
   }
+  const initExam = async ({ body, headers }) => {
+    handleLoaders({ initExam : true });
+    try {
+      return await InitExam({body, headers});
+    } catch (e) {
+      ctc(e, 'Hubo un error al iniciar el cuestionario.', toastRef);
+    } finally {
+      handleLoaders({ initExam : false });
+    }
+  }
+  const finishExam = async ({ body, headers }) => {
+    handleLoaders({ finishExam : true });
+    try {
+      return await SendAnswersExam({body, headers});
+    } catch (e) {
+      ctc(e, 'Hubo un error al enviar las respuestas del cuestionario.', toastRef);
+    } finally {
+      handleLoaders({ finishExam : false });
+    }
+  }
 
   return ({
     schools,
     courses,
     currentSchool,
+    initExam,
+    finishExam,
     getCoursesByUser,
     getSchoolsByUser,
     getSchoolHeadByUser,

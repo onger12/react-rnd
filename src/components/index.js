@@ -1,6 +1,6 @@
 export * from './admin/admin-card';
 export * from './admin/admin-chart';
-export * from './admin/admin-popular-courses-card';;
+export * from './admin/admin-popular-card';
 export * from './admin/videos/edit/edit-video-dialog';
 export * from './admin/videos/edit/info-general-tab';
 export * from './admin/videos/new/info-general-tab';
